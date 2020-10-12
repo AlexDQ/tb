@@ -14,7 +14,8 @@ body {
   color: #758697;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased !important;
-  padding:0
+  padding:0;
+  margin:0
 }
 
 h1,
