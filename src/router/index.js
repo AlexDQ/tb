@@ -27,6 +27,11 @@ export default new Router({
           name: '个人信息管理',
           component: infoManagement
         },
+        {
+          path: '/locationAnalysis',
+          name: '个人信息管理',
+          component: infoManagement
+        },
       ]
     }
   ]

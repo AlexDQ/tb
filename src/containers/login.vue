@@ -197,24 +197,24 @@ export default {
 		passwd: '',
 		repeatPasswd: ''
 	  },
-      signUpForm: {
-        tel: "",
-        email: "",
-        address: "",
-        age: "",
-        sex: "",
-        passwd: "",
-        name: "",
-      },
-      rule: {
-        name: [{ validator: checkName, required: true, trigger: "blur" }],
-        passwd: [{ validator: checkPWD, required: true, trigger: "blur" }],
-        email: [{ validator: checkEmail, required: true, trigger: "blur" }],
-        tel: [{ validator: checkTel, required: true, trigger: "blur" }],
+    signUpForm: {
+      tel: "",
+      email: "",
+      address: "",
+      age: "",
+      sex: "",
+      passwd: "",
+      name: "",
+    },
+    rule: {
+      name: [{ validator: checkName, required: true, trigger: "blur" }],
+      passwd: [{ validator: checkPWD, required: true, trigger: "blur" }],
+      email: [{ validator: checkEmail, required: true, trigger: "blur" }],
+      tel: [{ validator: checkTel, required: true, trigger: "blur" }],
 	  },
 	  rule1: {
         passwd: [{ validator: checkPWD, required: true, trigger: "blur" }],
-		email: [{ validator: checkEmail, required: true, trigger: "blur" }],
+		    email: [{ validator: checkEmail, required: true, trigger: "blur" }],
         repeatPasswd: [{ validator: checkPWD, required: true, trigger: "blur" }]
       },
     };

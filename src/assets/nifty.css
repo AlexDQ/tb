@@ -1,7 +1,8 @@
 html,
 body {
   min-width: 290px;
-  -ms-overflow-style: scrollbar
+  -ms-overflow-style: scrollbar;
+  height:100%
 }
 
 body {

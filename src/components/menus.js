@@ -1,9 +1,5 @@
 const menus = [
     {
-        text: '个人信息管理',
-        path: '/infoManagement'
-    },
-    {
         text: '全国消费用户位置分析',
         path: '/locationManagement'
     },
