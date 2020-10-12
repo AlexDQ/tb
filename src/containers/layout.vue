@@ -2,22 +2,17 @@
   <div class='dark'>
     <div class='header'>
       <div class='header-bg'>
-      <!-- <i class='icon-antiy'></i> -->
-      <!-- <div class='title'>安天战术型态势感知平台</div> -->
       <span class='dateStr'>
-          {{dataStr}}
+          <!-- {{dataStr}} -->
       </span>
       <div class='menu_right'>
-
         <i
           class='icon-PersonalCenter person'
           @click='userModel=true'
         ></i>
       </div>
     </div>
-
     </div>
-
     <div
       class='model_wraper'
       v-show='userModel'
@@ -26,57 +21,14 @@
       <div class='user'>
         <el-button
           type="primary"
-          @click='LOGOUT'
+          @click='logout'
         >退出登录</el-button>
       </div>
     </div>
     <div class='main-content'>
-      <!-- <menu>
-        <ul>
-
-          <li
-           @mouseout="outMenuIndex(index)"
-          @click="changeMenuIndex(index)"
-            class="menu_li"
-            v-for='(item,index) in menus'
-            @click='handleMenuClick(item,index,null)'
-            :key="index"
-            :class="{'active':index==menuIndex }"
-          >
-            <div class='menu_name'>
-              {{item.name}}
-              <i
-                class='icon-down'
-                v-if='item.child'
-              ></i>
-            </div>
-            <div
-              class='sub_menu'
-              v-if='item.child'
-            >
-              <ul v-show='index==subMenuIndex && flgI'>
-                <li
-                  v-for='(k,i) in item.child'
-                  :class="{'active_sub':i===subI}"
-                  @click='handleMenuClick(k,index,i)'
-                  :key="i"
-                >
-                  {{k.name}}
-                </li>
-              </ul>
-            </div>
-          </li>
-
-        </ul>
-      </menu> -->
       <menu>
-        <!-- background-color="#171E35" -->
-        <!-- text-color="rgba(152, 172, 217, 0.7)" -->
-        <!-- active-text-color="#FFFFFF" -->
         <el-menu
           class="el-menu-vertical-demo"
-          @open="handleOpen"
-          @close="handleClose"
           @select="handleSelect"
           active-text-color='#08B6D7'
           :default-active="$route.path"
@@ -114,20 +66,8 @@
         </el-menu>
       </menu>
       <div class='right_contain'>
-        <!-- <div class='breadcrumb'>
-          <el-breadcrumb separator=">">
-            <el-breadcrumb-item
-              v-for='(item, index) in breadcrumbs'
-              :key='index'
-            >{{item}}</el-breadcrumb-item>
-          </el-breadcrumb>
-        </div> -->
         <transition>
-          <!-- <keep-alive max="10"> -->
             <router-view :key='$route.fullPath'></router-view>
-            <!-- :closetabs="tabEdit" -->
-            <!-- :editableTabs="editableTabs" -->
-          <!-- </keep-alive> -->
         </transition>
       </div>
     </div>
@@ -191,24 +131,7 @@
 import { debounce } from '../utils/debounce.js'
 import { compileStr } from '../utils/encryption.js'
 import { mapState } from 'vuex'
-
-const matchedType = {
-  all: '全部',
-  maliciouscode: '恶意代码',
-  c2: 'C&C',
-  netIntrusion: '网络入侵',
-  unfix: '漏洞',
-  illegal_access: '违规接入',
-  illegal_outer_access: '违规外联',
-  attack: '威胁',
-  web_threat: '威胁',
-  vul: '脆弱性',
-  web_visible: '可用性',
-  visible: '可用性',
-  content: '内容',
-  except: '异常'
-}
-
+import menus from '../components/menus.js'
 let ansLocationLayout = []
 const getMenuListLocation = (name, tree, location) => {
   for (let i = 0; i < tree.length; i++) {
@@ -288,6 +211,8 @@ export default {
       }, 1000)
     }
     return {
+      userModel: false,
+      menus:menus,
       dialogVisibleOne: false,
       setTingTopic: false,
       changeTopic: false,
@@ -306,23 +231,10 @@ export default {
         newPass: '',
         retPass: ''
       },
-      menus:[],
       changePasswordRule: {
         oldPass: [{ validator: checkOldPwd, required: true, trigger: 'blur' }],
         newPass: [{ validator: checkNewPwd, trigger: 'blur', required: true }],
         retPass: [{ validator: checkReNewPwd, trigger: 'blur', required: true }]
-      },
-      filterText: '',
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      },
-
-      locationStyle: {
-        width: 200 + 'px',
-        top: 89 + 'px',
-        left: 50 + 'px',
-        display: 'block'
       },
       firstTitle: '',
       secendTitle: [],
@@ -330,242 +242,22 @@ export default {
       Breadcrumb: []
     }
   },
-  mounted() {
-    // this.$store.dispatch('system/getTheme')
-  },
-  watch: {
-    // filterText (val) {
-    //   this.$refs.tree.filter(val)
-    // },
-    assetTreeDataChoose(value) {
-      // this.$refs.tree.setCheckedKeys(value)
-    },
-    $route(to) {
-      let name = this.$route.name
-      if (
-        this.$route.name === undefined ||
-        this.$route.name === '' ||
-        this.$route.name.indexOf('@') != -1
-      ) {
-        for (let i in this.$route.matched) {
-          if (
-            this.$route.matched[i].name === undefined ||
-            this.$route.matched[i].name === '' ||
-            this.$route.name.indexOf('@') != -1
-          ) {
-            if (i != 0) {
-              name = this.$route.matched[i - 1].name
-            } else {
-              name = ''
-            }
-          }
-        }
-      }
-      if (name === '监测日志') {
-        name = matchedType[to.params.id]
-      }
-      ansLocationLayout = []
-      getMenuListLocation(name, this.menu, [])
-      if (ansLocationLayout.length === 0) {
-        for (let i in this.$route.matched) {
-          if (this.$route.matched[i].name === name) {
-            name = this.$route.matched[i - 1].name
-            getMenuListLocation(name, this.menu, [])
-            if (ansLocationLayout.length === 1) {
-              this.lineIndex = ansLocationLayout[0]
-            } else if (ansLocationLayout.length === 2) {
-              this.lineIndex = ansLocationLayout[0]
-              this.showControl = ansLocationLayout[1]
-              this.showControlExpand = ansLocationLayout[1]
-            } else {
-              this.lineIndex = ansLocationLayout[0]
-              this.showControl = ansLocationLayout[1]
-              this.showControlExpand = ansLocationLayout[1]
-              this.showControlChild = ansLocationLayout[2]
-            }
-          }
-        }
-      } else if (ansLocationLayout.length === 1) {
-        this.lineIndex = ansLocationLayout[0]
-      } else if (ansLocationLayout.length === 2) {
-        this.lineIndex = ansLocationLayout[0]
-        this.showControl = ansLocationLayout[1]
-        this.showControlExpand = ansLocationLayout[1]
-      } else {
-        this.lineIndex = ansLocationLayout[0]
-        this.showControl = ansLocationLayout[1]
-        this.showControlExpand = ansLocationLayout[1]
-        this.showControlChild = ansLocationLayout[2]
-      }
-      this.Breadcrumb = makeBread(this.$route)
-    },
-    menu() {
-      let name = this.$route.name
-      if (
-        this.$route.name === undefined ||
-        this.$route.name === '' ||
-        this.$route.name.indexOf('@') != -1
-      ) {
-        for (let i in this.$route.matched) {
-          if (
-            this.$route.matched[i].name === undefined ||
-            this.$route.matched[i].name === '' ||
-            this.$route.name.indexOf('@') != -1
-          ) {
-            if (i != 0) {
-              name = this.$route.matched[i - 1].name
-            } else {
-              name = ''
-            }
-          }
-        }
-      }
-      if (name === '监测日志') {
-        name = matchedType[this.$route.params.id]
-      }
-      ansLocationLayout = []
-      getMenuListLocation(name, this.menu, [])
-      if (ansLocationLayout.length === 0) {
-        for (let i in this.$route.matched) {
-          if (this.$route.matched[i].name === name) {
-            name = this.$route.matched[i - 1].name
-            getMenuListLocation(name, this.menu, [])
-            this.lineIndex = ansLocationLayout[0]
-          }
-        }
-      } else if (ansLocationLayout.length === 1) {
-        this.lineIndex = ansLocationLayout[0]
-      } else if (ansLocationLayout.length === 2) {
-        this.lineIndex = ansLocationLayout[0]
-        this.showControl = ansLocationLayout[1]
-        this.showControlExpand = ansLocationLayout[1]
-      } else {
-        this.lineIndex = ansLocationLayout[0]
-        this.showControl = ansLocationLayout[1]
-        this.showControlExpand = ansLocationLayout[1]
-        this.showControlChild = ansLocationLayout[2]
-      }
-      this.Breadcrumb = makeBread(this.$route)
-    }
-    // for (let i = 0; i < currentUser.length; i++) {
-
-    // }
-  },
   components: {
   },
   created() {
-    this.getAuth()
+    // this.getAuth()
     this.Breadcrumb = makeBread(this.$route)
   },
   computed: {
     ...mapState({
       changePasswordControlClose: state =>
         state.system.changePasswordControlClose,
-      menu: state => state.system.menu,
       currentUser: state => state.system.currentUser,
-      assetTreeData: state => state.system.assetTreeData,
-      assetTreeDataChoose: state => state.system.assetTreeDataChoose
-    }),
-    showModelChangePass: {
-      set(val) {
-        this.$store.commit('system/settersRoot', {
-          key: 'showModelChangePass',
-          value: val
-        })
-      },
-      get() {
-        return this.$store.state.system.showModelChangePass
-      }
-    },
-    showModelChangeInfo: {
-      set(val) {
-        this.$store.commit('system/settersRoot', {
-          key: 'showModelChangeInfo',
-          value: val
-        })
-      },
-      get() {
-        return this.$store.state.system.showModelChangeInfo
-      }
-    },
-    fixHeadMenu: {
-      set(val) {
-        this.$store.commit('system/settersRoot', {
-          key: 'fixHeadMenu',
-          value: val
-        })
-      },
-      get() {
-        return this.$store.state.system.fixHeadMenu
-      }
-    },
-    fixFooterMenu: {
-      set(val) {
-        this.$store.commit('system/settersRoot', {
-          key: 'fixFooterMenu',
-          value: val
-        })
-      },
-      get() {
-        return this.$store.state.system.fixFooterMenu
-      }
-    },
-    fixLeftMenu: {
-      set(val) {
-        this.$store.commit('system/settersRoot', {
-          key: 'fixLeftMenu',
-          value: val
-        })
-      },
-      get() {
-        return this.$store.state.system.fixLeftMenu
-      }
-    },
-    topicValue: {
-      set(val) {
-        this.$store.commit('system/settersRoot', {
-          key: 'topicValue',
-          value: val
-        })
-      },
-      get() {
-        return this.$store.state.system.topicValue
-      }
-    }
+    })
   },
   methods: {
-    returnMain() {
-      this.$router.push({ path: '/main' })
-    },
-    changeColor(val) {
-      let item = {
-        val: val
-      }
-      this.$store.dispatch('system/changeTheme', item)
-    },
-    changeShowType() {
-      this.showTypeLayout = !this.showTypeLayout
-      this.$store.commit('system/changeSize', this.showTypeLayout)
-    },
-    checkChosseKey() {
-      this.showControlChangeAsset = false
-      this.$store.dispatch(
-        'system/changeFollowAsset',
-        this.$refs.tree.getCheckedKeys()
-      )
-    },
-    filterNode(value, data) {
-      if (!value) return true
-      return data.label.indexOf(value) !== -1
-    },
-    changeShowModelChangeAsset() {
-      this.filterText = ''
-      this.getAssetFollow()
-      this.showControlChangeAsset = true
-    },
-    getAssetFollow() {
-      this.$store.dispatch('system/getAssetFollow')
-      this.$store.dispatch('system/getFollowAsset')
+    handleSelect(index, pathIndex) {
+      this.getBreadcrumbs(index)
     },
     close() {
       this.$refs['changePassword'].resetFields()
@@ -593,81 +285,12 @@ export default {
     getAuth() {
       this.$store.dispatch('system/auth')
     },
-    secendJump(url) {
-      console.log(url)
-      this.showControl = this.sedendIndex
-      this.jumpAll(url)
-    },
-    mouseoverList(index) {
-      if (!this.showTypeLayout) {
-        this.sedendIndex = index
-        this.firstTitle = this.menu[this.lineIndex].children[index].text
-        this.secendTitle = this.menu[this.lineIndex].children[index].children
-        this.locationStyle = {
-          width: 180 + 'px',
-          top: 40 + index * 40 + 'px',
-          left: 40 + 'px',
-          display: 'block',
-          'z-index': 1000
-        }
-        this.showListSwitch = true
-      }
-    },
-    jumpAll(url) {
-      if (url !== null || url !== undefined) {
-        // this.$store.dispatch('system/jumpUrl', url)
-        this.$router.push(url)
-      }
-    },
-    changeMenu(index, list) {
-      var children = list.children
-      if (children === undefined) {
-        window.open('/view')
-      } else if (children[0].path) {
-        this.jumpAll(children[0].path)
-        this.lineIndex = index
-      } else {
-        this.jumpAll(children[0].children[0].path)
-        this.lineIndex = index
-      }
-
-      // this.jumpAll(url)
-    },
-    /*******/
     changeFixHead(val) {
       let item = {
         val: val ? 1 : 0
       }
       this.$store.dispatch('system/changeHeadFixed', item)
     },
-    changeLeftMenu(val) {
-      let item = {
-        val: val ? 1 : 0
-      }
-      this.$store.dispatch('system/changeLeftMenu', item)
-    },
-    changeFixFooter(val) {
-      let item = {
-        val: val ? 1 : 0
-      }
-      this.$store.dispatch('system/changeFooterFixed', item)
-    },
-    changeControler: debounce(
-      function(type, index, url) {
-        if (type === 'parent') {
-          this.menu[this.lineIndex].children[index].expand = !this.menu[
-            this.lineIndex
-          ].children[index].expand
-          if (url) {
-            this.jumpAll(url)
-          }
-        } else if (type === 'child') {
-          this.jumpAll(url)
-        }
-      },
-      500,
-      true
-    ),
     logout() {
       this.$store.dispatch('system/logout')
     },
@@ -691,174 +314,53 @@ export default {
   }
 }
 </script>
-
 <style>
-/*.main-tabs {
-  border-bottom: 1px solid #d3dce8;
-}*/
-.chose-topic .el-radio .is-checked + span {
-  color: #5c6781;
-}
-.main-tabs .el-tabs--card > .el-tabs__header .el-tabs__item {
-  border-bottom: 1px solid #d3dce8;
-  background: transparent;
-}
-.main-tabs .el-tabs--card {
-  position: relative !important;
-  margin-left: 0 !important;
-}
-.main-tabs .el-tabs__header {
-  border: 0;
-  margin: 0;
-  /* margin-left:-20px;
-  margin-right:-20px; */
-  width: 100%;
-}
-.main-tabs .el-tabs--card > .el-tabs__header .el-tabs__item {
-  border-top: 0;
-  border-left: 0;
-  border-right: 0;
-}
-.main-tabs .el-tabs__item {
-  position: relative;
-  display: inline-block;
-  z-index: 0;
-  background: transparent;
-  height: 29px;
-  line-height: 29px;
-  border-bottom: 1px solid #d3dce8;
-}
-
-.main-tabs .header-tabs .el-tabs__nav-scroll {
-  background: #f7f8fa;
-  padding-left: 20px;
-  padding-top: 2px;
-}
-
-.main-tabs .el-tabs__item.is-active {
-  color: #5c6781;
-}
-
-.main-tabs .el-tabs__nav {
-  border: 0;
-}
-.main-tabs .el-tabs--card > .el-tabs__header .el-tabs__nav {
-  border-bottom: 0;
+.main-content menu{
   padding: 0;
+  width: 196px;
 }
-.main-tabs .el-tabs--card > .el-tabs__header .el-tabs__item {
-  margin-left: 0px;
-  min-width: 100px;
+.main-content .el-menu{
+  background-image: linear-gradient(180deg, #162335 0%, #0D0F1D 100%);
+  border-right: none
 }
-.main-tabs .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
-  border-top: 0;
-  border-left: 0;
-  border-right: 0;
+.main-content .el-menu li{
+  color: #fff;
 }
-
-.main-tabs .el-tabs__header .el-tabs__nav > .el-tabs__item::before {
-  content: '';
+.el-menu-item:hover{
+  background: none !important;
+}
+.main-content .right_contain{
+  background: #EBF1F5;
+  overflow-x: hidden;
+  /* padding:0 20px 20px 20px; */
+}
+.main-content .el-menu-item:focus{
+  background:#25374F;
+  color:#08B6D7
+}
+.main-content .right_contain .breadcrumb{
+  background:#fff;
+  padding: 0
+}
+.main-content .el-submenu__title{
+  color: #fff
+}
+.main-content .el-submenu__title:hover{
+  background: none;
+}
+.header .dateStr{
+  font-family: PingFangSC-Regular;
+  font-size: 16px;
+  color: #FFFFFF;
+  line-height: 58px;
+  font-weight:lighter;
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: -1;
-  background-image: linear-gradient(
-    hsla(0, 0%, 100%, 0.6),
-    hsla(0, 0%, 100%, 0)
-  );
-  border: 1px solid #d3dce8;
-  border-bottom: none;
-  box-shadow: 0 0.15em #ffffff inset;
-  transform: perspective(0.3em) rotateX(1deg);
-  transform-origin: bottom;
+  right: 71px;
 }
-.main-tabs .el-tabs__nav > .el-tabs__item.is-active::before {
-  background: #ecf0f5;
-  box-shadow: 0 0.15em #ecf0f5 inset;
+.header .header-bg{
+  height: 56px;
+  background-size: cover;
 }
-/* .main-tabs .el-tabs__nav-wrap{
-  padding-left:20px;
-} */
-.el-tabs--card > .el-tabs__header .el-tabs__item.is-active.is-closable {
-  z-index: 1;
-}
-#main-contain .el-tabs__header .el-tabs__nav > .el-tabs__item::before {
-  content: '';
-  position: static;
-  z-index: 0;
-  background-image: '';
-  border: 0;
-  border-bottom: none;
-  box-shadow: 0;
-  transform: 0;
-  transform-origin: bottom;
-}
-.el-tabs__content {
-  border-top: 1px solid #d3dce8;
-}
-#main-contain .el-tabs__content {
-  border-top: 0;
-}
-/* .el-dialog-box .el-dialog--tiny .el-dialog__header {
-  padding: 0 20px;
-  height: 40px;
-  line-height: 38px;
-  border: 1px solid #1f92ef;
-  background-color: #1f92ef;
-}
-.el-dialog-box .el-dialog--tiny .el-dialog__title {
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 400;
-} */
-/* .el-dialog-box .el-dialog--tiny {
-    width: 500px;
-    height: 455px;
-    border: 1px solid #e3e9ec;
-} */
-.titlename {
-  width: 80px;
-  height: 40px;
-
-  padding-right: 15px;
-  text-align: right;
-  font-size: 12px;
-}
-.titledata {
-  word-wrap: break-word;
-  width: 200px;
-  height: 40px;
-  font-size: 12px;
-
-  padding-left: 15px;
-}
-.per_massage_dialog .el-dialog__body {
-  padding: 20px !important;
-}
-.per_massage {
-  border: 1px solid #eeeeee;
-}
-.el-tab-pane #bread-title {
-  padding: 12px;
-  padding-left: 20px;
-  /* border: 1px solid #eeeeee; */
-  border-top: 0;
-  background: transparent;
-  /* margin-bottom: 20px; */
-}
-#eldialog .el-dialog__body {
-  padding: 0 !important;
-  color: #5c6781;
-  font-size: 14px;
-  min-height: 100px;
-  border-bottom: 1px solid #eee;
-}
-/* #bread-title .el-breadcrumb{
-  height:40px;
-  line-height:40px;
-} */
 </style>
 
 

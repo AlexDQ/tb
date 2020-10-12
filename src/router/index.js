@@ -24,7 +24,7 @@ export default new Router({
       children: [
         {
           path: '/infoManagement',
-          name: '登录',
+          name: '个人信息管理',
           component: infoManagement
         },
       ]
