@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import Login from '@/containers/login.vue'
-import infoManagement from '@/containers/infoManagement.vue'
+import locationAnalysis from '@/containers/locationAnalysis.vue'
+import dataAnalysis from '@/containers/dataAnalysis.vue'
+import dataManagement from '@/containers/dataManagement.vue'
+
 import Layout from '@/containers/layout.vue'
 Vue.use(Router)
 
@@ -23,14 +25,19 @@ export default new Router({
       component: Layout,
       children: [
         {
-          path: '/infoManagement',
-          name: '个人信息管理',
-          component: infoManagement
+          path: '/locationAnalysis',
+          name: '地理位置分析',
+          component: locationAnalysis
         },
         {
-          path: '/locationAnalysis',
-          name: '个人信息管理',
-          component: infoManagement
+          path: '/dataAnalysis',
+          name: '销售数据分析',
+          component: dataAnalysis
+        },
+        {
+          path: '/dataManagement',
+          name: '销售数据管理',
+          component: dataManagement
         },
       ]
     }

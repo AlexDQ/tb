@@ -62,7 +62,8 @@ h6,
 .h5,
 .h6 {
   font-weight: 600;
-  color: #2b425b
+  color: #2b425b;
+  margin:0
 }
 
 ::selection {

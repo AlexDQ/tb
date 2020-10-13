@@ -52,6 +52,9 @@ axios.interceptors.response.use(function (response) {
 })
 
 const $http = (url, option = {}, header = {}) => {
+  if(url == '/asset/get/s/data-1528971808162-BkOXf61WX.json'){
+    axios.default.baseURL = 'https://gallerybox.echartsjs.com'
+  }
   return axios
     .request({ url, headers: { ...httpConfig.headers, ...header }, ...option })
     .catch(function (e) {

@@ -1,7 +1,7 @@
 const menus = [
     {
         text: '全国消费用户位置分析',
-        path: '/locationManagement'
+        path: '/locationAnalysis'
     },
     {
         text: '销售数据分析',
@@ -21,7 +21,7 @@ const menus = [
     },
     {
         text: '销售数据管理',
-        path: '/dataManagment'
+        path: '/dataManagement'
     },
     {
         text: '用户行为类型管理',

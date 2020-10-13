@@ -341,6 +341,7 @@ export default {
         } else {
           this.$store.dispatch("system/login", data);
         }
+        this.$router.push({name: '地理位置分析'})
       },
       2000,
       true

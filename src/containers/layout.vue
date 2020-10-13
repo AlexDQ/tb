@@ -316,8 +316,8 @@ export default {
 	showEditInfoDialog () {
 		this.dialogVisible = true
 	},
-    handleSelect(index, pathIndex) {
-      this.getBreadcrumbs(index);
+  handleSelect(index, pathIndex) {
+      // this.getBreadcrumbs(index);
 	},
 	close1 () {
 		this.dialogVisible = false
