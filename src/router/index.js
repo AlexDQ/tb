@@ -5,7 +5,12 @@ import locationAnalysis from '@/containers/locationAnalysis.vue'
 import dataAnalysis from '@/containers/dataAnalysis.vue'
 import dataManagement from '@/containers/dataManagement.vue'
 import behaviorAnalysis from '@/containers/behaviorAnalysis.vue'
+import userManagement from '@/containers/userManagement.vue'
 import Layout from '@/containers/layout.vue'
+import dataRepair from '@/containers/dataRepair.vue'
+import salesRepair from '@/containers/salesRepair.vue'
+
+
 Vue.use(Router)
 
 export default new Router({
@@ -43,6 +48,28 @@ export default new Router({
           path: '/behaviorAnalysis',
           name: '销售数据管理',
           component: behaviorAnalysis
+        },
+        {
+          path: '/userManagement',
+          name: '用户管理',
+          component: userManagement
+          
+        },
+        {
+          path: '/dataRepair',
+          name: '数据恢复',
+          children:[
+            {
+              path: '/salesRepair',
+              name: '数据恢复',
+              component: salesRepair
+            },
+            {
+              path: '/userRepair',
+              name: '用户恢复',
+              component: dataRepair
+            }
+          ]
         },
       ]
     }

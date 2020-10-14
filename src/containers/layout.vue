@@ -182,7 +182,7 @@ const makeBread = (data) => {
 };
 export default {
   data() {
-	let checkName = (rule, value, callback) => {
+	  let checkName = (rule, value, callback) => {
       if (value === "" || value === null) {
         callback(new Error("请输入姓名"));
       } else {
@@ -322,34 +322,34 @@ export default {
 	close1 () {
 		this.dialogVisible = false
 	},
-    close() {
-      this.$refs["changePassword"].resetFields();
-      this.$store.commit("system/settersRoot", {
-        key: "showModelChangePass",
-        value: false,
-      });
-    },
-    changeShowModelChangePass() {
-      this.$store.commit("system/settersRoot", {
-        value: true,
-        key: "changePasswordControlClose",
-      });
-      this.$store.commit("system/settersRoot", {
-        key: "showModelChangePass",
-        value: true,
-      });
-    },
-    getAuth() {
-      this.$store.dispatch("system/auth");
-    },
-    changeFixHead(val) {
-      let item = {
-        val: val ? 1 : 0,
-      };
-      this.$store.dispatch("system/changeHeadFixed", item);
-    },
-    logout() {
-      this.$store.dispatch("system/logout");
+  close() {
+    this.$refs["changePassword"].resetFields();
+    this.$store.commit("system/settersRoot", {
+      key: "showModelChangePass",
+      value: false,
+    });
+  },
+  changeShowModelChangePass() {
+    this.$store.commit("system/settersRoot", {
+      value: true,
+      key: "changePasswordControlClose",
+    });
+    this.$store.commit("system/settersRoot", {
+      key: "showModelChangePass",
+      value: true,
+    });
+  },
+  getAuth() {
+    this.$store.dispatch("system/auth");
+  },
+  changeFixHead(val) {
+    let item = {
+      val: val ? 1 : 0,
+    };
+    this.$store.dispatch("system/changeHeadFixed", item);
+  },
+  logout() {
+    this.$store.dispatch("system/logout");
 	},
 	submitForm (formName) {
       this.$refs['singUpForm'].validate((valid) => {

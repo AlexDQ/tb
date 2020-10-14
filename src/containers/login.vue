@@ -75,7 +75,7 @@
               >注册</el-button
             >
           </div>
-		  <div class="form-group">
+		      <div class="form-group">
             <el-button type="primary" @click="showForgetDialog" id="loginButton"
               >忘记密码</el-button
             >
@@ -109,12 +109,11 @@
       </span>
     </el-dialog>
     <el-dialog
-      title="提示"
+      title="注册"
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose"
     >
-      <span>这是一段信息</span>
       <el-form ref='signUpForm' :model="signUpForm" :rules="rule">
         <el-form-item prop="name" label="姓名">
           <el-input v-model="signUpForm.name"></el-input>
@@ -279,30 +278,30 @@ export default {
   methods: {
     showSignUpDialog() {
       this.dialogVisible = true;
-	},
-	showForgetDialog () {
-      this.dialogVisible1 = true;
-	},
+    },
+    showForgetDialog () {
+        this.dialogVisible1 = true;
+    },
     handleClose() {
       this.dialogVisible = false;
-	},
-	handleClose1 () {
-      this.dialogVisible1 = false;
-	},
+    },
+    handleClose1 () {
+        this.dialogVisible1 = false;
+    },
     getValidcode() {
       // 更换验证码
       this.$store.dispatch("system/validcode");
-	},
-	submitForm (formName) {
-      this.$refs['singUpForm'].validate((valid) => {
-        if (valid) {
-            // this.$store.dispatch('otherk/editdata', this.signUpForm)
-        } else {
-          return false;
-        }
-      })
-	},
-	submitForm1 (formName) {
+    },
+    submitForm (formName) {
+        this.$refs['singUpForm'].validate((valid) => {
+          if (valid) {
+              // this.$store.dispatch('otherk/editdata', this.signUpForm)
+          } else {
+            return false;
+          }
+        })
+    },
+	  submitForm1 (formName) {
       this.$refs['forgetForm'].validate((valid) => {
         if (valid) {
             // this.$store.dispatch('otherk/editdata', this.forgetForm)

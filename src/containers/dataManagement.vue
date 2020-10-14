@@ -1,6 +1,9 @@
 <template>
     <div id='dataManagement' style='padding:20px'>
         <div style='padding:10px;background-color: #fff;margin-bottom:20px'>
+            <h4>
+                商品下单数量走势分析
+            </h4>
             <div id='lineBar' style='width:100%;height: 400px;'>
             </div>
         </div>
@@ -90,10 +93,6 @@
                         position: function(pt) {
                             return [pt[0], '10%'];
                         }
-                    },
-                    title: {
-                        left: 'center',
-                        text: '商品下单数量走势分析',
                     },
                     toolbox: {
                         show: false,

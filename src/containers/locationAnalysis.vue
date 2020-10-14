@@ -1,9 +1,7 @@
 <template>
-    <div>
-        <div id='chinaMap' style='width:100%;height:1000px'>
+        <div id='chinaMap' style='width:100%;height:100%'>
 
         </div>
-    </div>
 </template>
 <script>
 import config from '../components/mapConfig.js'
