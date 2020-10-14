@@ -4,7 +4,7 @@ import Login from '@/containers/login.vue'
 import locationAnalysis from '@/containers/locationAnalysis.vue'
 import dataAnalysis from '@/containers/dataAnalysis.vue'
 import dataManagement from '@/containers/dataManagement.vue'
-
+import behaviorAnalysis from '@/containers/behaviorAnalysis.vue'
 import Layout from '@/containers/layout.vue'
 Vue.use(Router)
 
@@ -38,6 +38,11 @@ export default new Router({
           path: '/dataManagement',
           name: '销售数据管理',
           component: dataManagement
+        },
+        {
+          path: '/behaviorAnalysis',
+          name: '销售数据管理',
+          component: behaviorAnalysis
         },
       ]
     }
