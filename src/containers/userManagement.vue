@@ -11,15 +11,31 @@
             <el-table-column prop='' label='电话'></el-table-column>
             <el-table-column prop='' label='注册时间'></el-table-column>
             <el-table-column prop='' label='操作'>
-                <template>
+                <template slot-scope='scope'>
                     <div>
-                        <span @click='showEditDialog'>编辑</span>
-                        <span @click='showResetPwdDialog'>重置密码</span>
-                        <span @click='showDeleteDialog'>删除</span>
+                        <span @click='showEditDialog(scope.row)'>编辑</span>
+                        <span @click='showResetPwdDialog(scope.row)'>重置密码</span>
+                        <span @click='showDeleteDialog(scope.row)'>删除</span>
                     </div>
                 </template>
             </el-table-column>
         </el-table>
+        <el-dialog
+            title="个人信息修改"
+            :visible.sync="dialogVisible1"
+            width="30%"
+            :before-close="close1"
+        >
+            <span>
+                是否删除该用户
+            </span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible1 = false">取 消</el-button>
+                <el-button type="primary" @click="deleteSubmit"
+                >确 定</el-button
+                >
+            </span>
+        </el-dialog>
         <el-dialog
             title="个人信息修改"
             :visible.sync="dialogVisible"
@@ -86,6 +102,7 @@ export default {
         };
         return{
             dialogVisible: false,
+            dialogVisible1: false,
             signUpForm: {
                 tel: "",
                 email: "",
@@ -99,14 +116,23 @@ export default {
                 email: [{ validator: checkEmail, required: true, trigger: "blur" }],
                 tel: [{ validator: checkTel, required: true, trigger: "blur" }],
             },
+            row1: {},
+            row:{}
         }
     },
     methods:{
+        close1 () {
+            this.dialogVisible1 = false
+        }, 
+        deleteSubmit () {
+            this.$store.dispatch('', this.row1)
+        },
         showAddDialog () {
             this.dialogVisible = true
         },
-        showEditDialog () {
+        showEditDialog (row) {
             this.dialogVisible = true
+            this.row = row
         },
         close () {
             this.dialogVisible = false
@@ -123,8 +149,9 @@ export default {
         showResetPwdDialog () {
 
         },
-        showDeleteDialog () {
-
+        showDeleteDialog (row) {
+            this.dialogVisible1 = true
+            this.row1 = row
         }
     }
 }

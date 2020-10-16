@@ -9,6 +9,8 @@ import userManagement from '@/containers/userManagement.vue'
 import Layout from '@/containers/layout.vue'
 import dataRepair from '@/containers/dataRepair.vue'
 import salesRepair from '@/containers/salesRepair.vue'
+import behaviorManage from '@/containers/behaviorManage.vue'
+
 
 
 Vue.use(Router)
@@ -25,7 +27,7 @@ export default new Router({
       component: Login
     },
     {
-      path: '/platform',
+      path: '/',
       name: 'layout',
       component: Layout,
       children: [
@@ -56,21 +58,20 @@ export default new Router({
           
         },
         {
-          path: '/dataRepair',
-          name: '数据恢复',
-          children:[
-            {
-              path: '/salesRepair',
-              name: '数据恢复',
-              component: salesRepair
-            },
-            {
-              path: '/userRepair',
-              name: '用户恢复',
-              component: dataRepair
-            }
-          ]
+          path: '/salesRepair',
+          name: '销售数据恢复',
+          component: salesRepair
         },
+        {
+          path: '/userRepair',
+          name: '用户恢复',
+          component: dataRepair
+        },
+        {
+          path: '/typeManagement',
+          name: '用户行为管理',
+          component: behaviorManage
+        }
       ]
     }
   ]
