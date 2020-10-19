@@ -22,7 +22,7 @@ import echarts from 'Echarts'
 export default{
     data () {
         return {
-
+            
         }
     },
     mounted () {
@@ -478,7 +478,7 @@ export default{
                                 left: 'center',
                                 top: '30',
                                 style: {
-                                    text: 'pie title',
+                                    text: ' title',
                                     fontSize: 20,
                                 }
                             }

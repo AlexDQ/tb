@@ -5,20 +5,10 @@ const settersLogin = 'system/settersLogin'
 const login = 'system/login'
 const settersRoot = 'system/settersRoot'
 const auth = 'system/auth'
-const jumpUrl = 'system/jumpUrl'
 const logout = 'system/logout'
 const changPass = 'system/changePass'
-const getAssetFollow = 'system/getAssetFollow'
-const getFollowAsset = 'system/getFollowAsset'
-const changeFollowAsset = 'system/changeFollowAsset'
 const validationFilling = 'system/validationFilling'
 const changeSize = 'system/changeSize'
-const changeHeadFixed = 'system/changeHeadFixed'
-const changeFooterFixed = 'system/changeFooterFixed'
-const changeTheme = 'system/changeTheme'
-const getTheme = 'system/getTheme'
-const changeLeftMenu = 'system/changeLeftMenu'
-const GET_MAIN_COUNT = 'system/GET_MAIN_COUNT'
 const SET_MAIN_COUNT = 'system/SET_MAIN_COUNT'
 const SET_MENU = 'system/SET_MENU'
 const getPath = function (data) {
@@ -175,16 +165,9 @@ export default {
                 }
             }
         },
-        [jumpUrl](replace, data) {
-            router.push(data)
-            portalRouter.push(data)
-            exchangeRouter.push(data)
-            // commit();
-        },
         [logout]({ dispatch, commit }) {
             $http.post('/api/auth/loginout').then(({ status } = {}) => {
                 if (status === 'success') {
-                    dispatch(jumpUrl, '/login')
                     commit(logout)
                 }
             })
@@ -227,9 +210,6 @@ export default {
         [SET_MAIN_COUNT](state, data) {
             state.mainData = data
         },
-        [getFollowAsset](state, data) {
-            state.assetTreeDataChoose = data
-        },
         [changeSize](state, data) {
             state.changeSizeValue = data
         },
@@ -266,9 +246,6 @@ export default {
             }
             state[data.key] = data.value
             console.log(state)
-        },
-        [getAssetFollow](state, data) {
-            state.assetTreeData = data
         },
         [validationFilling](state, data) {
             state.login.validcodeInput = data

@@ -5,7 +5,6 @@
         <div class="panel-body">
           <div class="mar-ver pad-btm">
             <div style="margin-top: 135px"></div>
-            <!-- <i class='saas-icon-antiy' style="font-size:65px;color:#455b6b"/> -->
             <h3 style="color: #455b6b; font-size: 18px">
               基于淘宝用户行为分析可视化平台
             </h3>
