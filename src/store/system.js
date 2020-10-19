@@ -1,5 +1,6 @@
 import $http from '../utils/http.js'
 import { Notification } from 'element-ui'
+import router from '../router/index'
 const validcode = 'system/validcode'
 const settersLogin = 'system/settersLogin'
 const login = 'system/login'
@@ -100,7 +101,6 @@ export default {
                         localStorage.setItem("project", JSON.stringify(data.project.name))
                     }
                     // router.push(getPath(menu[0]))
-                    portalRouter.push(getPath(menu[0]))
 
                     // router.push('/web/warnings/validate')
                     // if (data.user.role_id === 1) router.push('/system/users')
@@ -160,8 +160,6 @@ export default {
                     // })
                     dispatch(logout)
                     router.push('/login')
-                    portalRouter.push('/login')
-                    exchangeRouter.push('/login')
                 }
             }
         },
