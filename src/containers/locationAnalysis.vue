@@ -1,87 +1,72 @@
 <template>
+    <div style='width:100%;height:100%'>
+        <el-date-picker v-model='timerange' style='position: absolute;z-index: 1;' type="daterange" range-separator="至"></el-date-picker>
         <div id='chinaMap' style='width:100%;height:100%'>
 
         </div>
+    </div>
 </template>
 <script>
 import config from '../components/mapConfig.js'
 import $http from '../utils/http.js'
 import axios from 'axios'
 import echarts from 'Echarts'
+import {mapState} from 'vuex'
 export default {
     data () {
         return {
-            config: config
+            config: config,
+            timerange: []
         }
     },
-    mounted () {
-        this.initEcharts()
+    computed:{
+        ...mapState({
+            location_data: state=> state.location.location_data,
+            showFlag: state=> state.location.showFlag,
+        })
+    },
+    // async mounted () {
+    //     debugger
+    //     console.log(this.location_data)
+    //     await this.initEcharts()
+    // },
+    watch:{
+        showFlag (newV, oldV) {
+            if(newV){
+                this.initEcharts()
+            }
+        }
+    },
+    created () {
+        this.$store.dispatch('location/GET_CHART_DATA')
     },
     methods:{
         initEcharts () {
             const myChart = echarts.init(document.getElementById('chinaMap'))
-            var year = ["2013", "2014", "2015", "2016", "2017", "2018","2019"];
-            var mapData = [
-                [],
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ];
-
+            var year = ["2020"];
+            var mapData = []
             /*柱子Y名称*/
             var categoryData = [];
             var barData = [];
-
+            console.log(this.location_data)
             for (var key in config.geoCoordMap) {
-                mapData[0].push({
-                    "year": '2013',
+                console.log(this.location_data)
+                mapData.push({
+                    "year": '2020',
                     "name": key,
-                    "value": config.d1[key],
+                    "value": this.location_data[key],
                 });
-                mapData[1].push({
-                    "year": '2014',
-                    "name": key,
-                    "value": config.d2[key],
-                });
-                mapData[2].push({
-                    "year": '2015',
-                    "name": key,
-                    "value": config.d3[key],
-                });
-                mapData[3].push({
-                    "year": '2016',
-                    "name": key,
-                    "value": config.d4[key],
-                });
-                mapData[4].push({
-                    "year": '2017',
-                    "name": key,
-                    "value": config.d5[key],
-                });
-                mapData[5].push({
-                    "year": '2018',
-                    "name": key,
-                    "value": config.d6[key],
-                });
-                mapData[6].push({
-                    "year": '2019',
-                    "name": key,
-                    "value": config.d7[key],
-                });
+                
             }
-
             for (var i = 0; i < mapData.length; i++) {
-                mapData[i].sort(function sortNumber(a, b) {
+                mapData.sort(function sortNumber(a, b) {
                     return a.value - b.value
                 });
                 barData.push([]);
                 categoryData.push([]);
-                for (var j = 0; j < mapData[i].length; j++) {
-                    barData[i].push(mapData[i][j].value);
-                    categoryData[i].push(mapData[i][j].name);
+                for (var j = 0; j < mapData.length; j++) {
+                    barData[i].push(mapData[j].value);
+                    categoryData[i].push(mapData[j].name);
                 }
             }
             echarts.registerMap('china', config.geoJson);
@@ -209,13 +194,11 @@ export default {
                 options: []
 
             };
-
             for (var n = 0; n < year.length; n++) {
                 optionXyMap01.options.push({
                     backgroundColor: '#013954',
                     title:
                         [{
-                                text: '跨境电商百度指数',
                                 left: '25%',
                                 top: '7%',
                                 textStyle: {
@@ -225,7 +208,7 @@ export default {
                             },
                             {
                                 id: 'statistic',
-                                text: year[n] + "数据统计情况",
+                                text: 2020 + "数据统计情况",
                                 left: '75%',
                                 top: '8%',
                                 textStyle: {
@@ -317,11 +300,11 @@ export default {
                             //  name: 'Top 5',
                             type: 'effectScatter',
                             coordinateSystem: 'geo',
-                            data: convertData(mapData[n].sort(function(a, b) {
+                            data: convertData(mapData.sort(function(a, b) {
                                 return b.value - a.value;
                             }).slice(0, 20)),
                             symbolSize: function(val) {
-                                return val[2] / 10;
+                                return val[2] / 20;
                             },
                             showEffectOn: 'render',
                             rippleEffect: {
