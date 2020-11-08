@@ -1,26 +1,18 @@
 import $http from '../utils/http.js'
 import { Notification } from 'element-ui'
+import router from '../router/index'
 const validcode = 'system/validcode'
 const settersLogin = 'system/settersLogin'
-const login = 'system/login'
+const LOG_IN = 'system/LOG_IN'
 const settersRoot = 'system/settersRoot'
 const auth = 'system/auth'
-const jumpUrl = 'system/jumpUrl'
 const logout = 'system/logout'
 const changPass = 'system/changePass'
-const getAssetFollow = 'system/getAssetFollow'
-const getFollowAsset = 'system/getFollowAsset'
-const changeFollowAsset = 'system/changeFollowAsset'
 const validationFilling = 'system/validationFilling'
 const changeSize = 'system/changeSize'
-const changeHeadFixed = 'system/changeHeadFixed'
-const changeFooterFixed = 'system/changeFooterFixed'
-const changeTheme = 'system/changeTheme'
-const getTheme = 'system/getTheme'
-const changeLeftMenu = 'system/changeLeftMenu'
-const GET_MAIN_COUNT = 'system/GET_MAIN_COUNT'
 const SET_MAIN_COUNT = 'system/SET_MAIN_COUNT'
 const SET_MENU = 'system/SET_MENU'
+const SIGN_IN = 'system/SIGN_IN'
 const getPath = function (data) {
     console.log(data, '-=-=-=-')
     if (data.path != undefined && data.path != null) {
@@ -63,128 +55,22 @@ export default {
         token: '',
     },
     actions: {
-        [validcode]({ commit }) {
-            $http.get('/api/validcode').then(({ status, msg, data } = {}) => {
-                if (status === 'success') commit(validcode, data)
-                else {
-                    Notification.error({
-                        title: '验证码获取失败',
-                        message: msg
-                    })
-                }
-            })
-        },
-        [login]({ dispatch, commit, state }, value) {
-            commit(settersRoot, { value: '', key: 'editableTabsValue' })
-            commit(settersRoot, { value: [], key: 'editableTabs' })
-            commit(settersRoot, { value: [], key: 'keepAliveInclude' })
-            $http.post('/api/auth', value).then(({ status, msg, data } = {}) => {
-                if (status === 'success') {
-                    Notification.success('登录成功')
-                    state.login = {
-                        username: '', // 用户名
-                        password: '', // 密码
-                        validcodeInput: '', // 用户输入的验证码
-                        validcode: {
-                            image: '' // 验证码图片
-                        }
-                    }
-                    let menu = []
-                    data.menu.map(vals => {
-                        if (vals.key.toUpperCase() === data.project.name) {
-                            menu.push(vals)
-                        }
-                    })
-                    console.log(JSON.parse(JSON.stringify(menu)))
-                    // commit(settersRoot, {value: menus, key: 'menu'})
-                    commit(settersRoot, { value: data.user, key: 'currentUser' })
-                    commit(settersRoot, { value: data.menu, key: 'menu', project: data.project.name })
-                    commit(settersRoot, { value: data.token, key: 'token' })
-                    console.log(data.project.name)
-                    let a = new Date() - new Date(data.user.update_time).getTime()
-                    console.log(a)
-                    if (a > 57 * 24 * 60 * 60 * 1000) {
-                        Notification.info('请及时修改密码')
-                    }
-                    if (data.project.name) {
-                        localStorage.setItem("project", JSON.stringify(data.project.name))
-                    }
-                    // router.push(getPath(menu[0]))
-                    portalRouter.push(getPath(menu[0]))
-
-                    // router.push('/web/warnings/validate')
-                    // if (data.user.role_id === 1) router.push('/system/users')
-                    // else if (data.user.role_id === 2) router.push('/test')
-                    // else if (data.user.role_id === 3) router.push('/logger')
-                } else {
-                    Notification.error({
-                        title: '登录失败',
-                        message: msg
-                    })
-                    dispatch(validcode)
-                }
-            })
-        },
-        async [auth]({ dispatch, commit }) {
-            let result = await $http.get('/api/auth')
-            if (result) {
-                let { status, data } = result
-                if (status === 'success') {
-                    for (let i in data.menu) {
-                        for (let j in data.menu[i].children) {
-                            this._vm.$set(data.menu[i].children[j], 'expand', false)
-                        }
-                    }
-                    let menu = []
-                    data.menu.map(vals => {
-                        if (vals.key.toUpperCase() === data.project.name) {
-                            menu.push(vals)
-                        }
-                    })
-                    for (let i in data.menu) {
-                        for (let j in data.menu[i].children) {
-                            this._vm.$set(data.menu[i].children[j], 'expand', false)
-                        }
-                    }
-                    commit(settersRoot, { value: data.token, key: 'token' })
-                    // commit(settersRoot, {value: menus, key: 'menu'})
-                    // commit(settersRoot, { value: data.menu, key: 'menu' })
-                    // commit(settersRoot, { value: { ...data.user }, key: 'currentUser' })
-                    commit(settersRoot, { value: data.menu, key: 'menu', project: data.project.name })
-                    commit(SET_MENU, data)
-                    commit(settersRoot, { value: false, key: 'showModelChangePass' })
-                    // commit(settersRoot, { value: data.menu, key: 'menu' })
-                    commit(settersRoot, { value: data.device, key: 'device' })
-                    commit(settersRoot, { value: data.project, key: 'project' })
-                } else if (status === 'default') {
-                    commit(settersRoot, { value: false, key: 'changePasswordControlClose' })
-                    commit(settersRoot, { value: true, key: 'showModelChangePass' })
-                    Notification.warning({
-                        title: '请修改初始密码'
-                        // message:msg
+        [LOG_IN]({ dispatch, commit }, obj) {
+            debugger
+            $http.post('/api/login', obj).then((data) => {
+                if (data.data.success) {
+                    router.push({name: '地理位置分析'})
+                    Notification.success({
+                        title: '登录成功'
                     })
                 } else {
-                    // Notification.warning({
-                    //     title:"没有权限，或权限已经失效",
-                    //     message:msg
-                    // })
-                    dispatch(logout)
-                    router.push('/login')
-                    portalRouter.push('/login')
-                    exchangeRouter.push('/login')
+                    Notification.success('登录失败')
                 }
-            }
-        },
-        [jumpUrl](replace, data) {
-            router.push(data)
-            portalRouter.push(data)
-            exchangeRouter.push(data)
-            // commit();
+            })
         },
         [logout]({ dispatch, commit }) {
             $http.post('/api/auth/loginout').then(({ status } = {}) => {
                 if (status === 'success') {
-                    dispatch(jumpUrl, '/login')
                     commit(logout)
                 }
             })
@@ -203,6 +89,20 @@ export default {
                     })
                 }
                 // commit();
+            })
+        },
+        [SIGN_IN]({ dispatch }, data) {
+            $http.post('/api/register', data).then(({ status, msg } = {}) => {
+                if (data.data.success) {
+                    Notification.success({
+                        title: '注册成功'
+                    })
+                } else {
+                    Notification.warning({
+                        title: '注册失败',
+                        message: msg
+                    })
+                }
             })
         }
     },
@@ -226,9 +126,6 @@ export default {
         },
         [SET_MAIN_COUNT](state, data) {
             state.mainData = data
-        },
-        [getFollowAsset](state, data) {
-            state.assetTreeDataChoose = data
         },
         [changeSize](state, data) {
             state.changeSizeValue = data
@@ -266,9 +163,6 @@ export default {
             }
             state[data.key] = data.value
             console.log(state)
-        },
-        [getAssetFollow](state, data) {
-            state.assetTreeData = data
         },
         [validationFilling](state, data) {
             state.login.validcodeInput = data

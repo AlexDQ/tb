@@ -9,28 +9,50 @@
             </div>
         </div>
         <div class='charts_wrapper'>
-            <h4 style='margin-bottom: 10px;'>
+            <h4 style='margin-bottom: 10px;'> 
                 基于时间维度行为习惯分析
             </h4> 
-            <div id='timeLine' style='width:100%;height:500px;'>
+            <div id='timeLine' style='width:100%;height:500px;'>   
             </div>
         </div>
     </div>
-</template>
+</template> 
 <script>
     import echarts from 'Echarts'
+    import {mapState} from 'vuex'
+
     export default{
         data () {
             return {
             }
         },
+        created () {
+            this.$store.dispatch('location/GET_BUY_DATA')
+            this.$store.dispatch('location/GET_TIME_DATA')
+        },
+        computed:{
+            ...mapState({
+                showFlag: state=> state.location.showFlag4,
+                buyXdata: state=> state.location.buyXdata,
+                buyYdata: state=> state.location.buyYdata,
+                buyData: state=> state.location.buyData,
+            })
+        },
         mounted () {
             this.initEcharts()
             this.initEcharts1()
         },
+        watch:{
+            showFlag (newV, oldV) {
+                if(newV){
+                    this.initEcharts()
+                }
+            }
+        },
         methods:{
             initEcharts () {
                 const myChart = echarts.init(document.getElementById('loudou'))
+                console.log(this.buyXdata, this.buyYdata, this.buyData)
                 let option = {
                     backgroundColor: {
                         type: 'linear',
@@ -55,7 +77,7 @@
                         formatter: "{a} <br/>{b} : {c}%"
                     },
                     legend: {
-                        data: ['A', 'B', 'C', 'D', 'E'],
+                        data: this.buyXdata,
                         x: 'center',
                         y: '92%',
                         textStyle: {
@@ -91,33 +113,9 @@
                                 show: false
                             },
 
-                            data: [{
-                                    value: 10,
-                                    name: 'A'
-                                }, {
-                                    value: 20,
-                                    name: 'B'
-                                },
-                                {
-                                    value: 40,
-                                    name: 'C'
-                                },
-                                {
-                                    value: 60,
-                                    name: 'D'
-                                },
-                                {
-                                    value: 80,
-                                    name: 'E'
-                                },
-                                {
-                                    value: 100,
-                                    name: 'F'
-                                }
-                            ]
+                            data: this.buyData
                         },
                         {
-                            name: 'TIT',
                             type: 'funnel',
                             left: 'center',
                             width: '80%',
@@ -148,30 +146,7 @@
                                     shadowColor: 'rgba(0, 0, 0, .6)'
                                 }
                             },
-                            data: [{
-                                    value: 2,
-                                    name: 'A'
-                                }, {
-                                    value: 5,
-                                    name: 'B'
-                                },
-                                {
-                                    value: 12,
-                                    name: 'C'
-                                },
-                                {
-                                    value: 18,
-                                    name: 'D'
-                                },
-                                {
-                                    value: 25,
-                                    name: 'E'
-                                },
-                                {
-                                    value: 40,
-                                    name: 'F'
-                                }
-                            ]
+                            data:  this.buyData
                         }
                     ]
                 };
@@ -235,7 +210,7 @@
                             }
                         }
                     }],
-                    series: [{
+                    series: {
                             name: '中央',
                             type: 'line',
                             stack: '总量',
@@ -261,148 +236,7 @@
                                 }
                             },
                             data: [120, 132, 101, 134, 90, 230, 210, 182, 191, 234, 260, 280]
-                        },
-                        {
-                            name: '自治区',
-                            type: 'line',
-                            stack: '总量',
-                            symbol: 'circle',
-                            symbolSize: 8,
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    areaStyle: {
-                                        //color: '#94C9EC'
-                                        color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
-                                            offset: 0,
-                                            color: 'rgba(7,44,90,0.3)'
-                                        }, {
-                                            offset: 1,
-                                            color: 'rgba(0,212,199,0.9)'
-                                        }]),
-                                    }
-                                }
-                            },
-                            data: [220, 182, 191, 210, 230, 270, 270, 201, 154, 140, 240, 250]
-                        },
-                        {
-                            name: '盟市',
-                            type: 'line',
-                            stack: '总量',
-                            symbol: 'circle',
-                            symbolSize: 8,
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    areaStyle: {
-                                        //color: '#94C9EC'
-                                        color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
-                                            offset: 0,
-                                            color: 'rgba(7,44,90,0.3)'
-                                        }, {
-                                            offset: 1,
-                                            color: 'rgba(114,144,89,0.9)'
-                                        }]),
-                                    }
-                                }
-                            },
-                            data: [150, 232, 201, 154, 190, 180, 210, 150, 182, 201, 154, 190]
-                        },
-                        {
-                            name: '旗县区',
-                            type: 'line',
-                            stack: '总量',
-                            symbol: 'circle',
-                            symbolSize: 8,
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    areaStyle: {
-                                        //color: '#94C9EC'
-                                        color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
-                                            offset: 0,
-                                            color: 'rgba(7,46,101,0.3)'
-                                        }, {
-                                            offset: 1,
-                                            color: 'rgba(0,166,246,0.9)'
-                                        }]),
-                                    }
-                                }
-                            },
-                            data: [150, 232, 201, 154, 190, 180, 210, 150, 182, 201, 154, 190]
-                        },
-                        {
-                            name: '整合资金',
-                            type: 'line',
-                            stack: '总量',
-                            symbol: 'circle',
-                            symbolSize: 8,
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    areaStyle: {
-                                        //color: '#94C9EC'
-                                        color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
-                                            offset: 0,
-                                            color: 'rgba(7,44,90,0.3)'
-                                        }, {
-                                            offset: 1,
-                                            color: 'rgba(0,212,199,0.9)'
-                                        }]),
-                                    }
-                                }
-                            },
-                            data: [150, 232, 201, 154, 190, 180, 210, 150, 182, 201, 154, 190]
-                        },
-                        {
-                            name: '其他',
-                            type: 'line',
-                            stack: '总量',
-                            symbol: 'circle',
-                            symbolSize: 8,
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    areaStyle: {
-                                        //color: '#94C9EC'
-                                        color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
-                                            offset: 0,
-                                            color: 'rgba(7,44,90,0.3)'
-                                        }, {
-                                            offset: 1,
-                                            color: 'rgba(0,212,199,0.9)'
-                                        }]),
-                                    }
-                                }
-                            },
-                            data: [200, 232, 201, 200, 190, 190, 210, 190, 182, 201, 154, 190]
                         }
-                    ]
                 };
                 myChart.setOption(option)
             }

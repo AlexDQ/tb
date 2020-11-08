@@ -1,6 +1,7 @@
 <template>
     <div id='dataAnalysis'>
         <div class='charts_wrapper'>
+            <el-date-picker style='margin-bottom:20px' format='yyyy-MM-dd hh:mm:ss' v-model='timerange' type="daterange" range-separator="至" @change='timeChange'></el-date-picker>
             <h4>每日PV访问量分析</h4>
             <div id='dataLine' style='width:100%;height:400px;margin-top:10px'>
             </div>
@@ -19,11 +20,48 @@
 </template>
 <script>
 import echarts from 'Echarts'
+import {mapState} from 'vuex'
 export default{
     data () {
         return {
-
+            timerange: []
         }
+    },
+    computed:{
+        ...mapState({
+            location_data: state=> state.location.location_data,
+            showFlag: state=> state.location.showFlag1,
+            showFlag1: state=> state.location.showFlag2,
+            showFlag2: state=> state.location.showFlag3,
+            pvXdata:  state=> state.location.pvXdata,
+            pvYdata:  state=> state.location.pvYdata,
+            uvXdata:  state=> state.location.uvXdata,
+            uvYdata:  state=> state.location.uvYdata,
+            totalXdata:  state=> state.location.totalXdata,
+            totalYdata:  state=> state.location.totalYdata,
+        })
+    },
+    watch:{
+        showFlag (newV, oldV) {
+            if(newV){
+                this.initEcharts()
+            }
+        },
+        showFlag1 (newV, oldV) {
+            if(newV){
+                this.initEcharts1()
+            }
+        },
+        showFlag2 (newV, oldV) {
+            if(newV){
+                this.initEcharts2()
+            }
+        }
+    },
+    created(){
+        this.$store.dispatch('location/GET_PV_DATA')
+        this.$store.dispatch('location/GET_UV_DATA')
+        this.$store.dispatch('location/GET_TOTAL_DATA')
     },
     mounted () {
         this.initEcharts()
@@ -31,6 +69,10 @@ export default{
         this.initEcharts2()
     },  
     methods:{
+        timeChange (val) {
+            console.log(val, this.timerange)
+            this.$store.dispatch('location/GET_PV_DATA', {start_time: '2020-10-17 00:00:00', end_time: '2020-10-19 00:00:00'})
+        },
         initEcharts () {
             const myChart = echarts.init(document.getElementById('dataLine'))
             let option = {
@@ -82,7 +124,7 @@ export default{
                         show: false
                     },
                     boundaryGap: false,
-                    data: ["2020-06-21", "2020-06-22", "2020-06-23", "2020-06-24", "2020-06-25", "2020-06-26", "2020-06-27"] //this.$moment(data.times).format("HH-mm") ,
+                    data: this.pvXdata //this.$moment(data.times).format("HH-mm") ,
 
                 }],
 
@@ -187,7 +229,7 @@ export default{
                                 ], false),
                             }
                         },
-                        data: [3, 5, 4, 2, 1, 7, 6] //data.values
+                        data: this.pvYdata//data.values
                     },
                 ]
             };
@@ -239,8 +281,6 @@ export default{
             echarts.graphic.registerShape('CubeLeft', CubeLeft)
             echarts.graphic.registerShape('CubeRight', CubeRight)
             echarts.graphic.registerShape('CubeTop', CubeTop)
-            const MAX = [6000, 6000, 6000, 6000, 6000, 5000, 4000, 3000, 2000, 4000, 3000, 2000]
-            const VALUE = [2012, 1230, 3790, 2349, 1654, 1230, 3790, 2349, 1654, 3790, 2349, 1654]
             let option = {
                 backgroundColor: "#010d3a",
                 title: {
@@ -261,9 +301,7 @@ export default{
                 },
                 xAxis: {
                     type: 'category',
-                    data: ['德州', '德城区', '陵城区', '禹城市', '乐陵市', '临邑县',
-                        '平原县', '夏津县', '武城县', '庆云县', '宁津县', '齐河县'
-                    ],
+                    data: this.uvXdata,
                     axisLine: {
                         show: true,
                         lineStyle: {
@@ -303,55 +341,6 @@ export default{
                     boundaryGap: ['20%', '20%']
                 },
                 series: [{
-                    type: 'custom',
-                    renderItem: function(params, api) {
-                        const location = api.coord([api.value(0), api.value(1)])
-                        return {
-                            type: 'group',
-                            children: [{
-                                type: 'CubeLeft',
-                                shape: {
-                                    api,
-                                    xValue: api.value(0),
-                                    yValue: api.value(1),
-                                    x: location[0],
-                                    y: location[1],
-                                    xAxisPoint: api.coord([api.value(0), 0])
-                                },
-                                style: {
-                                    fill: 'rgba(7,29,97,.6)'
-                                }
-                            }, {
-                                type: 'CubeRight',
-                                shape: {
-                                    api,
-                                    xValue: api.value(0),
-                                    yValue: api.value(1),
-                                    x: location[0],
-                                    y: location[1],
-                                    xAxisPoint: api.coord([api.value(0), 0])
-                                },
-                                style: {
-                                    fill: 'rgba(10,35,108,.7)'
-                                }
-                            }, {
-                                type: 'CubeTop',
-                                shape: {
-                                    api,
-                                    xValue: api.value(0),
-                                    yValue: api.value(1),
-                                    x: location[0],
-                                    y: location[1],
-                                    xAxisPoint: api.coord([api.value(0), 0])
-                                },
-                                style: {
-                                    fill: 'rgba(11,42,106,.8)'
-                                }
-                            }]
-                        }
-                    },
-                    data: MAX
-                }, {
                     type: 'custom',
                     renderItem: (params, api) => {
                         const location = api.coord([api.value(0), api.value(1)])
@@ -423,34 +412,7 @@ export default{
                             }]
                         }
                     },
-                    data: VALUE
-                }, {
-                    type: 'bar',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'top',
-                            formatter: (e) => {
-                                switch (e.name) {
-                                    case '10kV线路':
-                                        return VALUE[0]
-                                    case '公用配变':
-                                        return VALUE[1]
-                                    case '35kV主变':
-                                        return VALUE[2]
-                                    case '水':
-
-                                }
-                            },
-                            fontSize: 16,
-                            color: '#fff',
-                            offset: [4, -25]
-                        }
-                    },
-                    itemStyle: {
-                        color: 'transparent'
-                    },
-                    data: MAX
+                    data: this.uvYdata
                 }]
             }
             myChart.setOption(option)
@@ -462,27 +424,7 @@ export default{
                     elements: [{
                         type: 'group',
                         left: 'center',
-                        top: 'center',
-                        children: [{
-                                type: 'text',
-                                left: 'center',
-                                top: '0',
-                                style: {
-                                    text: 999,
-                                    fontSize: 30,
-                                    fill: '#0af'
-                                }
-                            },
-                            {
-                                type: 'text',
-                                left: 'center',
-                                top: '30',
-                                style: {
-                                    text: 'pie title',
-                                    fontSize: 20,
-                                }
-                            }
-                        ]
+                        top: 'center',                                          
                     }]
                 },
                 grid: {
@@ -494,7 +436,7 @@ export default{
                 },
                 xAxis: [{
                     // type: 'value',
-                    data: ['x1', 'x2', 'x3', 'x4', 'x5'],
+                    data: this.totalXdata,
                     splitLine: {
                         show: false
                     },
@@ -563,32 +505,7 @@ export default{
                     extraCssText: 'transition:none;box-shadow:1px 1px 10px #aaa;background:rgba(0,0,0,.5);bottom:auto;top:0;margin-bottom:-30px;pointer-events:none',
                 },
                 color: ['#0af', '#21D100', '#FFD013', '#FF6767'],
-                legend: {
-                    right: 0,
-                    icon: "rect",
-                    itemGap: 16,
-                    itemHeight: 8,
-                    itemWidth: 20,
-                    data: ['A', 'B', 'C'],
-                    selected: {
-                        'A': true,
-                    }
-                },
                 series: [{
-                    name: 'A',
-                    type: ['line', 'bar', 'pie'][0],
-                    showSymbol: false,
-                    lineStyle: {
-                        normal: {
-                            width: 1
-                        }
-                    },
-                    z: 3,
-                    data: [1, 2, 4, 4, 6, {
-                        name: 'x',
-                        value: 9
-                    }]
-                }, {
                     name: 'B',
                     type: ['line', 'bar', 'pie'][1],
                     barMaxWidth: 30,
@@ -599,36 +516,7 @@ export default{
                         }
                     },
                     z: 2,
-                    data: [5, 4, 2, 1, 1]
-                }, {
-                    name: 'C',
-                    type: ['line', 'bar', 'pie'][2],
-                    barMaxWidth: 30,
-                    showSymbol: false,
-                    lineStyle: {
-                        normal: {
-                            width: 1
-                        }
-                    },
-                    radius: ['40%', '55%'],
-                    z: 1,
-                    label: {
-                        align: 'left',
-                        formatter: '{d}%  {c}\n{b}',
-                    },
-                    data: [{
-                        name: '准点人数',
-                        value: 17,
-                    }, {
-                        name: '迟到人数',
-                        value: 1,
-                    }, {
-                        name: '请假人数',
-                        value: 1,
-                    }, {
-                        name: '未打卡人数',
-                        value: 1,
-                    }]
+                    data: this.totalYdata
                 }]
             };
             myChart.setOption(option)

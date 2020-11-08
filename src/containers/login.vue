@@ -5,7 +5,6 @@
         <div class="panel-body">
           <div class="mar-ver pad-btm">
             <div style="margin-top: 135px"></div>
-            <!-- <i class='saas-icon-antiy' style="font-size:65px;color:#455b6b"/> -->
             <h3 style="color: #455b6b; font-size: 18px">
               基于淘宝用户行为分析可视化平台
             </h3>
@@ -84,12 +83,12 @@
       </div>
     </div>
 	<el-dialog
-      title="提示"
+      title="修改密码"
       :visible.sync="dialogVisible1"
       width="30%"
       :before-close="handleClose1"
     >
-      <span>这是一段信息</span>
+      <span>修改密码</span>
       <el-form ref='forgetForm' :model="forgetForm" :rules="rule1">
         <el-form-item prop="email" label="邮箱">
           <el-input v-model="forgetForm.name"></el-input>
@@ -119,7 +118,7 @@
           <el-input v-model="signUpForm.name"></el-input>
         </el-form-item>
         <el-form-item prop="email" label="邮箱">
-          <el-input v-model="signUpForm.name"></el-input>
+          <el-input v-model="signUpForm.email"></el-input>
         </el-form-item>
         <el-form-item prop="passwd" label="密码">
           <el-input v-model="signUpForm.passwd"></el-input>
@@ -208,8 +207,8 @@ export default {
     rule: {
       name: [{ validator: checkName, required: true, trigger: "blur" }],
       passwd: [{ validator: checkPWD, required: true, trigger: "blur" }],
-      email: [{ validator: checkEmail, required: true, trigger: "blur" }],
-      tel: [{ validator: checkTel, required: true, trigger: "blur" }],
+      // email: [{ validator: checkEmail, required: true, trigger: "blur" }],
+      // tel: [{ validator: checkTel, required: true, trigger: "blur" }],
 	  },
 	  rule1: {
         passwd: [{ validator: checkPWD, required: true, trigger: "blur" }],
@@ -293,9 +292,9 @@ export default {
       this.$store.dispatch("system/validcode");
     },
     submitForm (formName) {
-        this.$refs['singUpForm'].validate((valid) => {
+        this.$refs['signUpForm'].validate((valid) => {
           if (valid) {
-              // this.$store.dispatch('otherk/editdata', this.signUpForm)
+            this.$store.dispatch('system/SIGN_IN', this.signUpForm)
           } else {
             return false;
           }
@@ -314,33 +313,22 @@ export default {
       function () {
         // 登录
         let data = {
-          username: compileStr(this.username),
-          password: compileStr(this.password),
-          validcode: compileStr(this.validcodeInput),
-          originalStr: this.validcode.originalStr,
+          email: this.username,
+          password: this.password,
         };
         if (this.username.replace(/(^\s*)|(\s*$)/g, "") == "") {
           Notification.error({
             title: "登录失败",
             message: "用户名不能为空",
           });
-          this.$store.dispatch("system/validcode");
         } else if (this.password.replace(/(^\s*)|(\s*$)/g, "") == "") {
           Notification.error({
             title: "登录失败",
             message: "密码不能为空",
           });
-          this.$store.dispatch("system/validcode");
-        } else if (this.validcodeInput.replace(/(^\s*)|(\s*$)/g, "") == "") {
-          Notification.error({
-            title: "登录失败",
-            message: "验证码不能为空",
-          });
-          this.$store.dispatch("system/validcode");
         } else {
-          this.$store.dispatch("system/login", data);
+          this.$store.dispatch("system/LOG_IN", data);
         }
-        this.$router.push({name: '地理位置分析'})
       },
       2000,
       true
