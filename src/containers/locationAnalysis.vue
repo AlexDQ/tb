@@ -1,6 +1,6 @@
 <template>
     <div style='width:100%;height:100%'>
-        <el-date-picker v-model='timerange' style='position: absolute;z-index: 1;' type="daterange" range-separator="至"></el-date-picker>
+        <el-date-picker @change='timeChange' v-model='timerange' style='position: absolute;z-index: 1;' type="daterange" range-separator="至"></el-date-picker>
         <div id='chinaMap' style='width:100%;height:100%'>
 
         </div>
@@ -41,6 +41,9 @@ export default {
         this.$store.dispatch('location/GET_CHART_DATA')
     },
     methods:{
+        timeChange () {
+            this.$store.dispatch('location/GET_CHART_DATA', {start_time: this.timerange[0], end_time: this.timerange[1]})
+        },
         initEcharts () {
             const myChart = echarts.init(document.getElementById('chinaMap'))
             var year = ["2020"];

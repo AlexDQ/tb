@@ -62,7 +62,8 @@ def sale_info():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 销售数据新增/修改
@@ -106,6 +107,7 @@ def sale_add():
             "msg": "操作成功"
         }
     except Exception as e:
+        print e
         return json.dumps(g.res, ensure_ascii=False)
 
 
@@ -152,7 +154,7 @@ def sale_analysis():
             where = where + """ and date_format(r_time, '%%Y') < '%s'""" % end_time
 
         g.cursor.execute("""select date_format(r_time,'%%Y-%%m-%%d') as name, count(1) as VALUE
-                            from sale_info where state = '1' and behavior_type = '4'
+                            from sale_info %s
                             GROUP BY date_format(r_time,'%%Y-%%m-%%d') order by date_format(r_time,'%%Y-%%m-%%d')""" % where)
 
         g.conn.commit()
@@ -163,7 +165,8 @@ def sale_analysis():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 # 销售数据下载
 @app.route('/api/sale/download', methods=['POST'])
@@ -184,8 +187,9 @@ def sale_download():
                         latitude, -- 纬度
                         item_category, -- 商品类别ID
                         date_format(r_time, '%%Y-%%m-%%d %%H:%%m:%%s') as 'time' -- 注册时间
-                from sale_info where id in (%s)
-        """ % ids
+                from sale_info 
+                --where id in (%s)
+        """ 
         g.cursor.execute(sql)
         out = g.cursor.fetchall()
 
@@ -209,4 +213,5 @@ def sale_download():
             "success": False,
             "msg": "销售数据下载失败"
         }
-        return response
+        print e
+    return response

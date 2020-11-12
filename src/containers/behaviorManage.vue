@@ -1,30 +1,45 @@
 <template>
     <div id='behaviorManage'>
-        <div style='width:380px;height:350px;background-color: #fff;'>
-            <h4>用户行为类型占比分析</h4>
+        <div style='width:380px;height:350px;background-color: #fff;margin:20px 0 0 20px'>
+            <h4 style='text-indent:20px'>用户行为类型占比分析</h4>
             <div id='pieBehavior' style='width:300px;height:300px'>
             </div>
         </div>
         <div style='margin:20px;padding:20px;background:#fff'>
             <el-button type='primary' @click='showAddDialog'>新增</el-button>
+            <el-button type='primary' @click='dialogVisible1 = true'>删除</el-button>
             <el-button type='primary' @click='downloadExcel'>数据下载</el-button>
-            <el-table id='behaviorTable'>
-                <el-table-column prop='' label='序号'></el-table-column>
-                <el-table-column prop='' label='类别名称'></el-table-column>
-                <el-table-column prop='' label='添加人'></el-table-column>
-                <el-table-column prop='' label='记录时间'></el-table-column>
-                <el-table-column prop='' label='操作'>
+            <!-- {{behaviorData}} -->
+            <el-table id='behaviorTable' :data='behaviorData' @selection-change='selectChange'>
+                <el-table-column type='selection'></el-table-column>
+                <el-table-column prop='' label='序号'>
                     <template slot-scope='scope'>
                         <div>
+                            {{scope.$index + 1}}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop='name' label='类别名称'>
+                    <!-- <template slot-scope="scope">
+                        <div>
+                            {{scope.row.name ==1 ? "点击" : scope.row.name == 2 ? "收藏" : scope.row.name == 3 ? "加入购物车" : "购买"}}   
+                        </div>
+                    </template> -->
+                </el-table-column>
+                <el-table-column prop='username' label='添加人'></el-table-column>
+                <el-table-column prop='time' label='记录时间'></el-table-column>
+                <el-table-column prop='' label='操作'>
+                    <template slot-scope='scope'>
+                        <div style='color:#4099ff'>
                             <span @click='showEditDialog(scope.row)'>编辑</span>
-                            <span @click='showResetPwdDialog(scope.row)'>重置密码</span>
+                            <!-- <span @click='showResetPwdDialog(scope.row)'>重置密码</span> -->
                             <span @click='showDeleteDialog(scope.row)'>删除</span>
                         </div>
                     </template>
                 </el-table-column>
             </el-table>
             <el-dialog
-                title="个人信息修改"
+                title="删除"
                 :visible.sync="dialogVisible1"
                 width="30%"
                 :before-close="close1"
@@ -63,8 +78,10 @@
 </template>
 <script>
 import {Notification} from 'element-ui'
+import {mapState} from 'vuex'
 import FileSaver from "file-saver";
 import XLSX from "xlsx";
+import $http from './../utils/http'
 import echarts from 'Echarts'
 export default{
     data () {
@@ -74,12 +91,45 @@ export default{
             },
             dialogVisible: false,
             dialogVisible1: false,
+            tempList: [],
+            row: {},
+            type: 'add'
         }
+    },
+    watch:{
+        showFlag(newV, oldV){
+            if(newV){
+                this.initEcharts()
+            }
+        }
+    },
+    created () {
+        this.$store.dispatch('salesmanage/GET_PIE_DATA')
+        this.$store.dispatch('salesmanage/GET_BEHAVIOR_DATA')
     },
     mounted () {
         this.initEcharts()
     },
+    computed:{
+        ...mapState({
+            showFlag: state=>state.salesmanage.showFlag1,
+            piexdata: state=>state.salesmanage.piexdata,
+            pieydata: state=>state.salesmanage.pieydata,
+            behaviorData: state => state.salesmanage.behaviorData
+        })
+    },
     methods:{
+        selectChange (val) {
+            val.forEach((item, index)=>{
+                this.tempList.push(item.id)
+            })
+        },
+        showEditDialog (row) {
+            this.type = 'edit'
+            this.dialogVisible = true
+            this.form = row
+            this.row = row
+        },
         initEcharts () {
             const myChart = echarts.init(document.getElementById('pieBehavior'))
             let option = {
@@ -90,11 +140,10 @@ export default{
                 legend: {
                     orient: 'vertical',
                     left: 10,
-                    data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+                    data: this.piexdata
                 },
                 series: [
                     {
-                        name: '访问来源',
                         type: 'pie',
                         radius: ['50%', '70%'],
                         avoidLabelOverlap: false,
@@ -112,51 +161,42 @@ export default{
                         labelLine: {
                             show: false
                         },
-                        data: [
-                            {value: 335, name: '直接访问'},
-                            {value: 310, name: '邮件营销'},
-                            {value: 234, name: '联盟广告'},
-                            {value: 135, name: '视频广告'},
-                            {value: 1548, name: '搜索引擎'}
-                        ]
+                        data: this.pieydata
                     }
                 ]
             };
             myChart.setOption(option)
         },
         showAddDialog() {
+            this.type = 'add'
             this.dialogVisible = true
         },
         submitForm () {
             if(!this.form.name){
                 Notification.error('请填写类别名称')
+            } else {
+                if(this.type == 'edit'){
+                    Object.assign(this.form, {id: this.row.id})
+                }
+                Object.assign(this.form, {login_id: localStorage.getItem('userId')})
+                this.$store.dispatch('salesmanage/ADD_BEHAVIOR_DATA', this.form)
+                this.dialogVisible = false
             }
         },
         downloadExcel () {
-            var wb = XLSX.utils.table_to_book(document.querySelector("#behaviorTable"));
-            /* 获取二进制字符串作为输出 */
-            var wbout = XLSX.write(wb, {
-                bookType: "xlsx",
-                bookSST: true,
-                type: "array"
-            });
-            try {
-                FileSaver.saveAs(
-                //Blob 对象表示一个不可变、原始数据的类文件对象。
-                //Blob 表示的不一定是JavaScript原生格式的数据。
-                //File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。
-                //返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
-                new Blob([wbout], { type: "application/octet-stream" }),
-                //设置导出文件名称
-                "sheetjs.xlsx"
-                );
-            } catch (e) {
-                if (typeof console !== "undefined") console.log(e, wbout);
-            }
-            return wbout;
+            $http.post('/api/behaviors/download')
+        },
+        showDeleteDialog (row) {
+            this.dialogVisible1 = true
+            this.row = row
         },
         deleteSubmit () {
-            
+            if(this.tempList.length>0){
+                this.$store.dispatch('salesmanage/DELETE_BEHAVIOR_DATA', {id: this.tempList.join(',')})
+            } else {
+                this.$store.dispatch('salesmanage/DELETE_BEHAVIOR_DATA', {id: this.row.id})
+            }
+            this.dialogVisible1 = false
         },
         close () {
             

@@ -21,7 +21,7 @@ from App.recovery.api_recovery import app as api_recovery
 app.register_blueprint(api_recovery)
 
 from App.sale.api_sale import app as api_sale
-app.register_blueprint(api_recovery)
+app.register_blueprint(api_sale)
 
 from App.behaviors.api_behaviors import app as api_sale
 app.register_blueprint(api_sale)

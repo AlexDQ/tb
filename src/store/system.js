@@ -56,10 +56,10 @@ export default {
     },
     actions: {
         [LOG_IN]({ dispatch, commit }, obj) {
-            debugger
             $http.post('/api/login', obj).then((data) => {
                 if (data.data.success) {
                     router.push({name: '地理位置分析'})
+                    localStorage.setItem('userId', data.data.obj.userid)
                     Notification.success({
                         title: '登录成功'
                     })

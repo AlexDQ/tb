@@ -21,7 +21,7 @@
                   class="form-control"
                   placeholder="账号"
                   v-model="username"
-                  @input="changeValue('username', $event.target.value)"
+                  @input="changeValue('username', username)"
                 />
               </div>
             </div>
@@ -35,12 +35,12 @@
                   type="password"
                   class="form-control"
                   placeholder="密码"
-                  @input="changeValue('password', $event.target.value)"
+                  @input="changeValue('password', password)"
                   v-model="password"
                 />
               </div>
             </div>
-            <div class="form-group" style="margin-bottom: 21px">
+            <!-- <div class="form-group" style="margin-bottom: 21px">
               <div class="input-group">
                 <el-input
                   autocomplete="off"
@@ -51,18 +51,9 @@
                   @input="changeValue('validcodeInput', $event.target.value)"
                   v-model="validcodeInput"
                 />
-                <img
-                  style="
-                    border-top-right-radius: 20px;
-                    border-bottom-right-radius: 20px;
-                  "
-                  v-bind:src="validcode.image"
-                  id="vaImg"
-                  v-on:click="getValidcode"
-                />
               </div>
               <div class="clearFloat"></div>
-            </div>
+            </div> -->
             <div class="form-group">
               <el-button type="primary" @click="submit" id="loginButton"
                 >登 录</el-button
@@ -172,7 +163,7 @@ export default {
       }
     };
     let checkTel = (rule, value, callback) => {
-      var regex = new RegExp("/^1[3456789]d{9}$/");
+      var regex = new RegExp("^1[3456789]d{9}$");
       if (!regex.test(value)) {
         callback(new Error("请输入正确格式的手机号码"));
       } else {
@@ -180,7 +171,7 @@ export default {
       }
     };
     let checkEmail = (rule, value, callback) => {
-      var regex = new RegExp("/^([a-zA-Zd])(w|-)+@[a-zA-Zd]+.[a-zA-Z]{2,4}$/");
+      var regex = new RegExp("^([a-zA-Zd])(w|-)+@[a-zA-Zd]+.[a-zA-Z]{2,4}$");
       if (!regex.test(value)) {
         callback(new Error("请输入正确格式的电子邮箱"));
       } else {
@@ -191,9 +182,9 @@ export default {
 	  dialogVisible1: false,
 	  dialogVisible: false,
 	  forgetForm:{
-		email: '',
-		passwd: '',
-		repeatPasswd: ''
+      email: '',
+      passwd: '',
+      repeatPasswd: ''
 	  },
     signUpForm: {
       tel: "",
@@ -208,7 +199,7 @@ export default {
       name: [{ validator: checkName, required: true, trigger: "blur" }],
       passwd: [{ validator: checkPWD, required: true, trigger: "blur" }],
       // email: [{ validator: checkEmail, required: true, trigger: "blur" }],
-      // tel: [{ validator: checkTel, required: true, trigger: "blur" }],
+      call: [{ validator: checkTel, required: true, trigger: "blur" }],
 	  },
 	  rule1: {
         passwd: [{ validator: checkPWD, required: true, trigger: "blur" }],
@@ -289,7 +280,7 @@ export default {
     },
     getValidcode() {
       // 更换验证码
-      this.$store.dispatch("system/validcode");
+      // this.$store.dispatch("system/validcode");
     },
     submitForm (formName) {
         this.$refs['signUpForm'].validate((valid) => {
@@ -334,10 +325,6 @@ export default {
       true
     ),
     changeValue(key, value) {
-      // 获取用户名、密码、验证码
-      if (key === "validcodeInput") {
-        this.validcodeTest = true;
-      }
       let data = {
         key: key,
         value: value,

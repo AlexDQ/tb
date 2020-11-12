@@ -1,14 +1,20 @@
 <template>
     <div style='margin:20px;padding:20px;background:#fff'>
-        <el-table>
-            <el-table-column prop='' label='序号'></el-table-column>
-            <el-table-column prop='' label='年龄'></el-table-column>
-            <el-table-column prop='' label='性别'></el-table-column>
-            <el-table-column prop='' label='家庭住址'></el-table-column>
-            <el-table-column prop='' label='邮箱'></el-table-column>
-            <el-table-column prop='' label='角色'></el-table-column>
-            <el-table-column prop='' label='电话'></el-table-column>
-            <el-table-column prop='' label='注册时间'></el-table-column>
+        <el-table :data='tableDataRepaire'>
+            <el-table-column prop='' label='序号'>
+                <template slot-scope="scope">
+                    <div>
+                        {{scope.$index + 1}}
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column prop='age' label='年龄'></el-table-column>
+            <el-table-column prop='sex' label='性别'></el-table-column>
+            <el-table-column prop='address' label='家庭住址'></el-table-column>
+            <el-table-column prop='email' label='邮箱'></el-table-column>
+            <el-table-column prop='role' label='角色'></el-table-column>
+            <el-table-column prop='call' label='电话'></el-table-column>
+            <el-table-column prop='time' label='注册时间'></el-table-column>
             <el-table-column prop='' label='操作'>
                 <template slot-scope='scope'>
                     <div>
@@ -38,11 +44,20 @@
     </div>
 </template>
 <script>
+import {mapState} from 'vuex'
 export default{
     data () {
         return {
-
+            dialogVisible: false
         }
+    },
+    computed:{
+        ...mapState({
+            tableDataRepaire: state=> state.usermanage.tableDataRepaire
+        })
+    },
+    created () {
+        this.$store.dispatch('usermanage/GET_REPAIRE_DATA')
     },
     methods:{
         showResetDialog (row) {
@@ -51,6 +66,9 @@ export default{
         },
         resetData () {
             this.$store.dispatch('', this.row)
+            this.dialogVisible = false
+        },
+        close () {
             this.dialogVisible = false
         }
     }

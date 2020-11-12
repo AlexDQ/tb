@@ -1,23 +1,42 @@
 <template>
     <div id='dataManagement' style='padding:20px'>
+        <el-select v-model='form.behavior_type' placeholder='请选择行为类型' @change='selectChange'>
+            <el-option label='点击' value='1'></el-option>
+            <el-option label='收藏' value='2'></el-option>
+            <el-option label='加入购物车' value='3'></el-option>
+            <el-option label='购买' value='4'></el-option>
+        </el-select>
+        <el-input type='search' 
+            v-model='form.item_id' 
+            style='width:400px;margin-bottom:20px' 
+            placeholder='请搜索商品ID'
+            suffix-icon='el-icon-search' 
+            @keyup.enter.native='searchTable'>
+        </el-input>
         <div style='padding:10px;background-color: #fff;margin-bottom:20px'>
             <h4>
                 商品下单数量走势分析
             </h4>
+            
             <div id='lineBar' style='width:100%;height: 400px;'>
             </div>
         </div>
         <div style='padding:20px;background:#fff'>
-            <el-input type='search' v-model='value' style='width:400px;float:right' suffix-icon='el-icon-search' @change='searchTable'>
-            </el-input>
             <el-button type='primary' id='downBtn' @click='exportExcl()'>
                 数据下载
             </el-button>
+            <el-button type='primary' @click='showAddDialog'>新增</el-button>
             <div style='clear:both'>
 
             </div>
             <el-table style='margin-top:20px' id='exportTable' :data='tableData'>
-                <el-table-column prop='date' label='序号'></el-table-column>
+                <el-table-column prop='date' label='序号'>
+                    <template slot-scope='scope'>
+                        <div>
+                            {{scope.$index + 1}}
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column prop='name' label='用户ID'></el-table-column>
                 <el-table-column prop='address' label='商品ID'></el-table-column>
                 <el-table-column prop='' label='用户行为类型'></el-table-column>
@@ -27,7 +46,44 @@
                 <el-table-column prop='' label='记录时间'></el-table-column>
             </el-table>
         </div>
-        
+        <el-dialog
+            :title="type"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="close"
+            >
+            <el-form ref="datafrom" :model="dataform" :rules="rule">
+                <el-form-item prop="item_id" label="商品ID">
+                    <el-input v-model="dataform.item_id"></el-input>
+                </el-form-item>
+                <el-form-item prop="item_category" label="商品类别">
+                    <el-input v-model="dataform.item_category"></el-input>
+                </el-form-item>
+                <el-form-item prop="r_time" label="时间">
+                    <el-date-picker format='yyyy-MM-dd hh:mm:ss' v-model="dataform.r_time"></el-date-picker>
+                </el-form-item>
+                <el-form-item prop="behavior_type" label="用户行为类型">
+                    <el-select v-model="dataform.behavior_type">
+                        <el-option label='点击' value='1'></el-option>
+                        <el-option label='收藏' value='2'></el-option>
+                        <el-option label='加入购物车' value='3'></el-option>
+                        <el-option label='购买' value='4'></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item prop="longitude" label="经度">
+                <el-input v-model="dataform.longitude"></el-input>
+                </el-form-item>
+                <el-form-item prop="latitude" label="纬度">
+                <el-input v-model="dataform.latitude"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submitForm"
+                >确 定</el-button
+                >
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -37,38 +93,107 @@
     import echarts from 'Echarts'
     export default{
         data () {
+            let checkName = (rule, value, callback) => {
+                if (value === "" || value === null) {
+                    callback(new Error("请输入商品ID"));
+                } else {
+                    callback();
+                }
+            }
             return {
                 value: '',
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                    date: '2016-05-04',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1517 弄'
-                }, {
-                    date: '2016-05-01',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1519 弄'
-                }, {
-                    date: '2016-05-03',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1516 弄'
-                }]
+                dialogVisible: false,
+                row:{},
+                type: 'add',
+                rule: {
+                    item_id: [{ validator: checkName, required: true, trigger: "blur" }],
+                    // call: [{ validator: checkTel, required: false, trigger: "blur" }],
+                },
             }
+        },
+        computed:{
+            ...mapState({
+                tableData: state => state.salesmanage.tableData,
+                form: state=> state.salesmanage.form,
+                showFlag:  state=> state.salesmanage.showFlag,
+                xdata:  state=> state.salesmanage.xdata,
+                ydata:  state=> state.salesmanage.ydata,
+                dataform: state => state.salesmanage.dataform
+            })
+        },
+        created () {
+            // this.$store.dispatch('salesmanage/GET_TABLE_DATA')
+            this.$store.dispatch('salesmanage/GET_CHART_DATA')
+        },
+        watch:{
+            showFlag (newV, oldV) {
+                if(newV){
+                    this.initEcharts()
+                }
+            },
         },
         mounted () {
             this.initEcharts()
         },
         methods:{
-            initEcharts () {
+            etNowFormatDate(d) {
+                var date = d;
+                var seperator1 = "-";
+                var seperator2 = ":";
+                var month = date.getMonth() + 1;
+                var strDate = date.getDate();
+                if (month >= 1 && month <= 9) {
+                    month = "0" + month;
+                }
+                if (strDate >= 0 && strDate <= 9) {
+                    strDate = "0" + strDate;
+                }
+                var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+                        + " " + date.getHours() + seperator2 + date.getMinutes()
+                        + seperator2 + date.getSeconds();
+                return currentdate;
+            },
+            showAddDialog () {
+                this.dialogVisible = true
+            },
+            close () {
+                this.dialogVisible = false
+            },
+            submitForm (formName) {
+                this.$refs['datafrom'].validate((valid) => {
+                    if (valid) {
+                        if(this.type == 'edit'){
+                            Object.assign(this.datafrom, {id: this.row.id})
+                        }
+                        this.dataform.r_time = this.etNowFormatDate(this.dataform.r_time) 
+                        this.$store.dispatch('salesmanage/SUBMIT_FORM_DATA', this.dataform)
+                        this.dialogVisible = false
+                    } else {
+                        this.dialogVisible = false
+                        return false;
+                    }
+                })
+            },
+            deleteSubmit () {
+                this.$store.dispatch('usermanage/DETLET_USER_DATA', {id:this.row1.login_id})
+                this.showDeleteDialog = false
+            },
+            showEditDialog (type, row) {
+                this.type = type
+                this.dialogVisible = true
+                this.row = row
+                this.datafrom = Object.assign(row, {})
+            },
+            selectChange (val) {
+                this.$store.dispatch('salesmanage/GET_TABLE_DATA')
+            },
+            initEcharts ()  {
                 const myChart = echarts.init(document.getElementById('lineBar'))
                 var base = +new Date(2020, 9, 1);
                 var interval = 24 * 3600 * 1000;
                 var now = new Date(base); // 时间
                 var date = [getTime(now)];
-                var data = [15]; // 初始数据
+                var data = [15]; // 初始数据 
                 for (var i = 1; i < 30; i++) {
                     now = new Date(base += interval);
                     let r = Math.random();
@@ -105,10 +230,10 @@
                         }
                     },
                     xAxis: {
-                        show: false,
+                        show: true,
                         type: 'category',
                         boundaryGap: false,
-                        data: date
+                        data: this.xdata
                     },
                     yAxis: {
                         type: 'value',
@@ -164,7 +289,7 @@
                                 color: 'rgb(255, 70, 131)'
                             }])
                         },
-                        data: data
+                        data: this.ydata
                     }]
                 };
                 myChart.setOption(option)
@@ -174,29 +299,7 @@
                 this.$store.dispatch()
             },
             exportExcl () {
-                //blob URL形式文件下载
-                /* 从表生成工作簿对象 */
-                var wb = XLSX.utils.table_to_book(document.querySelector("#exportTable"));
-                /* 获取二进制字符串作为输出 */
-                var wbout = XLSX.write(wb, {
-                    bookType: "xlsx",
-                    bookSST: true,
-                    type: "array"
-                });
-                try {
-                    FileSaver.saveAs(
-                    //Blob 对象表示一个不可变、原始数据的类文件对象。
-                    //Blob 表示的不一定是JavaScript原生格式的数据。
-                    //File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。
-                    //返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
-                    new Blob([wbout], { type: "application/octet-stream" }),
-                    //设置导出文件名称
-                    "sheetjs.xlsx"
-                    );
-                } catch (e) {
-                    if (typeof console !== "undefined") console.log(e, wbout);
-                }
-                return wbout;
+                this.$store.dispatch('salesmanage/DOWNLOAD_CSV_DATA')
             }
         }
     }

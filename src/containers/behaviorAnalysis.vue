@@ -33,9 +33,12 @@
         computed:{
             ...mapState({
                 showFlag: state=> state.location.showFlag4,
+                showFlag1: state=> state.location.showFlag5,
                 buyXdata: state=> state.location.buyXdata,
                 buyYdata: state=> state.location.buyYdata,
                 buyData: state=> state.location.buyData,
+                timeXdata: state=> state.location.timeXdata,
+                timeYdata: state=> state.location.timeYdata
             })
         },
         mounted () {
@@ -46,6 +49,11 @@
             showFlag (newV, oldV) {
                 if(newV){
                     this.initEcharts()
+                }
+            },
+            showFlag1 (newV, oldV) {
+                if(newV){
+                    this.initEcharts1()
                 }
             }
         },
@@ -178,15 +186,6 @@
                             }
                         }
                     },
-                    legend: {
-                        show: true,
-                        x: 'center',
-                        top: '20',
-                        textStyle: {
-                            color: fontColor
-                        },
-                        data: ['中央', '自治区', '盟市', '旗县区', '整合资金', '其他']
-                    },
                     xAxis: [{
                         type: 'category',
                         boundaryGap: false,
@@ -199,7 +198,7 @@
                                 color: '#397cbc'
                             }
                         },
-                        data: ['2016年', '2017年', '2018年', '2019年', '2020年']
+                        data: this.timeXdata
                     }],
                     yAxis: [{
                         type: 'value',
@@ -208,7 +207,8 @@
                             lineStyle: {
                                 color: fontColor
                             }
-                        }
+                        },
+                        data: this.timeYdata
                     }],
                     series: {
                             name: '中央',
@@ -235,7 +235,7 @@
                                     }
                                 }
                             },
-                            data: [120, 132, 101, 134, 90, 230, 210, 182, 191, 234, 260, 280]
+                            data: this.timeYdata
                         }
                 };
                 myChart.setOption(option)

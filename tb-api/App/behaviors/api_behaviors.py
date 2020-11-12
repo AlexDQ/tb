@@ -17,7 +17,7 @@ app = Blueprint(__name__ + "_app", __name__)
 @app.route('/api/behaviors/ana', methods=['GET'])
 def behaviors_ana():
     try:
-        g.cursor.execute("""select name, count(1) as num from behavior_info where state = '1'
+        g.cursor.execute("""select name, count(1) as value from behavior_info where state = '1'
                             group by name""")
 
         g.conn.commit()
@@ -28,7 +28,8 @@ def behaviors_ana():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 用户行为类型信息
@@ -38,19 +39,17 @@ def behaviors_info():
         data_all = request.form
         name = data_all.get("name")   # 用户行为类型 取值为“1,2，3,4” 分别表示“点击、收藏、加入购物车、购买”
 
-        where = """where state = '1' """
+        where = """where a.state = '1' """
 
-        if behavior_type:
+        if name:
             where = where + """ and name like '%%%s%%'""" % name
-
-        g.cursor.execute("""SELECT a."id",   -- 序号
+        g.cursor.execute("""SELECT a.id,   -- 序号
                                    a.name,  -- 类别
                                    b.username, -- 添加人
                                    date_format(a.r_time, '%%Y-%%m-%%d %%H:%%m:%%s') as 'time' -- 注册时间
                             from behavior_info a
                             left join login_info b on a.login_id = b.login_id
                             %s""" % where)
-
         g.conn.commit()
         g.res = {
             "code":"200",
@@ -59,25 +58,25 @@ def behaviors_info():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 销售数据新增/修改
 @app.route('/api/behaviors/add', methods=['POST'])
 def behaviors_add():
-    try:
+    # try:
         data_all = request.form
         _id = data_all.get("id")             # 序号
         login_id = data_all.get("login_id")  # 用户ID
         name = data_all.get("name")          # 类别名称
-
         if _id:
             g.cursor.execute("""update behavior_info 
                                 set name = '%s'
                                 where id = '%s'""" % (name, _id))
         else:
-            g.cursor.execute("""insert into sale_info(login_id, name,  r_time)
-                                values('%s', '%s', now())""" % (login_id, name))
+            g.cursor.execute("""insert into behavior_info(login_id, name,  r_time, state)
+                                values('%s', '%s', now(), 1)""" % (login_id, name))
 
         g.conn.commit()
         g.res = {
@@ -85,7 +84,8 @@ def behaviors_add():
             "success": True,
             "msg": "操作成功"
         }
-    except Exception as e:
+    # except Exception as e:
+    #     print e
         return json.dumps(g.res, ensure_ascii=False)
 
 
@@ -93,8 +93,9 @@ def behaviors_add():
 # 删除销售信息
 @app.route('/api/behaviors/delete', methods=['POST'])
 def behaviors_delete():
-    try:
+    # try:
         data_all = request.form
+        print data_all.get("id")
         ids = data_all.get("id").split(',')  # 序号 ,连接 如：1,2,3
         for i in ids:
             g.cursor.execute("""update behavior_info set state = '0' where id = '%s'""" % i)
@@ -104,7 +105,8 @@ def behaviors_delete():
             "success": True,
             "msg": "删除用户成功"
         }
-    except Exception as e:
+    # except Exception as e:
+    #     print e
         return json.dumps(g.res, ensure_ascii=False)
 
 
@@ -145,4 +147,5 @@ def behaviors_download():
             "success": False,
             "msg": "用户行为类型数据下载失败"
         }
-        return response
+        print e
+    return response

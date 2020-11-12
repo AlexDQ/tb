@@ -45,7 +45,8 @@ def recovery_user():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 销售数据恢复
@@ -79,4 +80,5 @@ def recovery_sale():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)

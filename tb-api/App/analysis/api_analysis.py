@@ -239,7 +239,8 @@ def analysis_xg():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 基于时间维度行为习惯分析
@@ -273,4 +274,5 @@ def analysis_sj():
             "data": g.cursor.fetchall()
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)

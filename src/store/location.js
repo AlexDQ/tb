@@ -22,6 +22,7 @@ export default {
         showFlag2: false,
         showFlag3: false,
         showFlag4: false,
+        showFlag5: false,
         pvdata:{},
         pvXdata:[],
         pvYdata:[],
@@ -31,7 +32,9 @@ export default {
         totalYdata:[],
         buyXdata: [],
         buyXdata:[],
-        buyData: []
+        buyData: [],
+        timeXdata: [],
+        timeYdata: []
     },
     actions: {
         [GET_CHART_DATA]({ dispatch, commit }, obj) {
@@ -127,15 +130,15 @@ export default {
             state.totalYdata = temp1
             state.showFlag3 = true
         },
-        [SET_TIME_DATA](){
-            // let temp = [], temp1 = []
-            // data.forEach((item, index)=>{
-            //     temp.push(item.name)
-            //     temp1.push(item.VALUE)
-            // })
-            // state.totalXdata = temp
-            // state.totalYdata = temp1
-            // state.showFlag3 = true
+        [SET_TIME_DATA](state, data){
+            let temp = [], temp1 = []
+            data.forEach((item, index)=>{
+                temp.push(item.t)
+                temp1.push(item.value)
+            })
+            state.timeXdata = temp
+            state.timeYdata = temp1
+            state.showFlag5 = true
         },
         [SET_BUY_DATA](state, data){
             state.buyData = data

@@ -73,9 +73,11 @@ def useinfo_list():
         # 传入参数
         name = request.args.get("name", "")  # 用户名
         source = request.args.get("pageNo")
+        print request.args.get("pageNo")
         pageSize = int(request.args.get("pageSize"))
         pageNo = (int(request.args.get("pageNo")) - 1) * pageSize
-
+        print pageSize
+        print pageNo
         where = "where state = '1' "
         if name:
             where = where + "and username = '%s' " % name
@@ -128,7 +130,8 @@ def useinfo_list():
                 }
             }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 获取用户详情
@@ -174,7 +177,8 @@ def useinfo_details():
                 "obj": sql_name
             }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 新增/修改用户
@@ -244,7 +248,8 @@ def useinfo_add():
             "success": False,
             "msg": "获取用户详情失败"
         }
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 删除用户
@@ -262,7 +267,8 @@ def user_delete():
             "msg": "删除用户成功"
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
 
 
 # 用户密码重置
@@ -279,4 +285,5 @@ def resetPassword():
             "msg": "重置用户密码成功"
         }
     except Exception as e:
-        return json.dumps(g.res, ensure_ascii=False)
+        print e
+    return json.dumps(g.res, ensure_ascii=False)
